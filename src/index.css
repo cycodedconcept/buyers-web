@@ -1,1 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 @import "tailwindcss";
+
+:root {
+  /* Color */
+	--main: #ff7101;
+  --heading: #24272C;
+  --line: #EDEDED;
+  --text: #696665;
+  --on-surface: #161E2D;
+  --on-surface-v1: #5C6368;
+  --icon: #B6B6B6;
+
+  /* Font */
+  --fraunces: 'Fraunces', serif;
+  --outfit: 'Outfit', sans-serif;
+  --dm-sans: "DM Sans", sans-serif;
+
+  /* Font size */
+  --main-head: 70px;
+  --main-head-mob: 32px;
+}
+
+@theme {
+  --font-fraunces: 'Fraunces', serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-dm-sans: "DM Sans", sans-serif;
+
+  --color-main: #ff7101;
+  --color-heading: #24272C;
+  --color-line: #EDEDED;
+  --color-text: #696665;
+  --color-on-surface: #161E2D;
+  --color-on-surface-v1: #5C6368;
+  --color-icon: #B6B6B6;
+
+  --shadow-tiny: 0 2px 6px 0 #8A3D000;
+  --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1290px !important;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.hero-btn-options {
+  @apply relative font-(family-name:--outfit) text-white text-base font-medium cursor-pointer border border-white py-2 px-4 rounded-lg hover:bg-(--main) hover:border-(--main) hover:before:absolute hover:before:-bottom-1 hover:before:-translate-x-1/4 hover:before:left-1/2 hover:before:rotate-45 hover:before:bg-(--main) hover:before:w-3 hover:before:h-3
+}

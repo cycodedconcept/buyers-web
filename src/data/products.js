@@ -96,6 +96,50 @@ const products = [
     oldPrice: 25000,
     tag: "New"
 	},
+	{
+		img: timingBeltImg,
+		car: "Honda Civic / Accord 2015–2021",
+		part: "Timing Belt Kit — Gates OEM",
+		location: "Lagos",
+		rating: 4.6,
+		ownerStatus: "Verified seller",
+		newPrice: 22000,
+    oldPrice: 25000,
+    tag: "New"
+	},
+	{
+		img: starterMotorImg,
+		car: "Honda Civic / Accord 2015–2021",
+		part: "Starter Motor — Tested, Working",
+		location: "Lagos",
+		rating: 4.6,
+		ownerStatus: "Verified seller",
+		newPrice: 22000,
+    oldPrice: 25000,
+    tag: "Used"
+	},
+	{
+		img: rearShockAbsorberImg,
+		car: "Honda Civic / Accord 2015–2021",
+		part: "Rear Shock Absorber — KYB",
+		location: "Lagos",
+		rating: 4.6,
+		ownerStatus: "Verified seller",
+		newPrice: 22000,
+    oldPrice: 25000,
+    tag: "Refurbished"
+	},
+	{
+		img: radiatorImg,
+		car: "Honda Civic / Accord 2015–2021",
+		part: "Radiator Upper Hose — Genuine",
+		location: "Lagos",
+		rating: 4.6,
+		ownerStatus: "Verified seller",
+		newPrice: 22000,
+    oldPrice: 25000,
+    tag: "New"
+	},
 ];
 
 export default products;

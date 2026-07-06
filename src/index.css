@@ -30,12 +30,13 @@
   --color-main: #ff7101;
   --color-heading: #24272C;
   --color-line: #EDEDED;
+  --color-out-line: #E4E4E4;
   --color-text: #696665;
   --color-on-surface: #161E2D;
   --color-on-surface-v1: #5C6368;
   --color-icon: #B6B6B6;
 
-  --shadow-tiny: 0 2px 6px 0 #8A3D000;
+  --shadow-tiny: 0 2px 6px 0 rgba(138, 61, 0, 0.06);
   --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -46,5 +47,5 @@
 }
 
 .hero-btn-options {
-  @apply relative font-(family-name:--outfit) text-white text-base font-medium cursor-pointer border border-white py-2 px-4 rounded-lg hover:bg-(--main) hover:border-(--main) hover:before:absolute hover:before:-bottom-1 hover:before:-translate-x-1/4 hover:before:left-1/2 hover:before:rotate-45 hover:before:bg-(--main) hover:before:w-3 hover:before:h-3
+  @apply z-20 relative font-(family-name:--outfit) text-main lg:text-white hover:text-white text-base font-medium cursor-pointer border border-main lg:border-white py-2 px-4 rounded-lg hover:bg-(--main) hover:border-(--main) lg:hover:before:absolute lg:hover:before:-bottom-1 lg:hover:before:-translate-x-1/4 lg:hover:before:left-1/2 lg:hover:before:rotate-45 lg:hover:before:bg-(--main) lg:hover:before:w-3 lg:hover:before:h-3
 }

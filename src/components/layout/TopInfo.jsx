@@ -6,12 +6,12 @@ const TopInfo = () => {
   return (
 		<>
 			<div className="bg-heading py-4">
-				<div className="container flex items-center justify-between px-3 lg:px-0">
+				<div className="container px-4 flex items-center justify-between">
 					<div className="flex gap-8">
-						<p className="text-sm text-line font-outfit font-medium flex gap-3 hidden lg:flex">
+						<p className="text-sm text-line font-outfit font-medium gap-3 hidden md:flex">
 							<LuBookOpen size={20} /> 6, Taiwo Aina Street, Maryland, Lagos
 						</p>
-						<p className="text-sm text-line font-outfit font-medium flex gap-3 hidden lg:flex">
+						<p className="text-sm text-line font-outfit font-medium gap-3 hidden md:flex">
 							<LuClock3 size={20} /> Mon - Sat 8.00 - 18.00
 						</p>
 						<p className="text-sm text-line font-outfit font-medium flex gap-3">

@@ -1,20 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@100..900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
 :root {
   /* Color */
-	--main: #ff7101;
-  --heading: #24272C;
-  --line: #EDEDED;
+  --main: #ff7101;
+  --heading: #24272c;
+  --line: #ededed;
   --text: #696665;
-  --on-surface: #161E2D;
-  --on-surface-v1: #5C6368;
-  --icon: #B6B6B6;
+  --on-surface: #161e2d;
+  --on-surface-v1: #5c6368;
+  --icon: #b6b6b6;
 
   /* Font */
-  --fraunces: 'Fraunces', serif;
-  --outfit: 'Outfit', sans-serif;
+  --fraunces: "Fraunces", serif;
+  --outfit: "Outfit", sans-serif;
   --dm-sans: "DM Sans", sans-serif;
 
   /* Font size */
@@ -23,29 +24,115 @@
 }
 
 @theme {
-  --font-fraunces: 'Fraunces', serif;
+  --font-fraunces: "Fraunces", serif;
   --font-outfit: "Outfit", sans-serif;
   --font-dm-sans: "DM Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
 
   --color-main: #ff7101;
-  --color-heading: #24272C;
-  --color-line: #EDEDED;
-  --color-out-line: #E4E4E4;
+  --color-heading: #24272c;
+  --color-line: #ededed;
+  --color-out-line: #e4e4e4;
   --color-text: #696665;
-  --color-on-surface: #161E2D;
-  --color-on-surface-v1: #5C6368;
-  --color-icon: #B6B6B6;
+  --color-on-surface: #161e2d;
+  --color-on-surface-v1: #5c6368;
+  --color-icon: #b6b6b6;
 
   --shadow-tiny: 0 2px 6px 0 rgba(138, 61, 0, 0.06);
   --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+
+  --breakpoint-md: 800px;
+}
+
+body {
+  @apply overflow-x-hidden;
 }
 
 .container {
-  max-width: 1290px !important;
-  width: 100%;
-  margin-inline: auto;
+  @apply max-w-[1290px] w-full mx-auto;
 }
 
 .hero-btn-options {
-  @apply z-20 relative font-(family-name:--outfit) text-main lg:text-white hover:text-white text-base font-medium cursor-pointer border border-main lg:border-white py-2 px-4 rounded-lg hover:bg-(--main) hover:border-(--main) lg:hover:before:absolute lg:hover:before:-bottom-1 lg:hover:before:-translate-x-1/4 lg:hover:before:left-1/2 lg:hover:before:rotate-45 lg:hover:before:bg-(--main) lg:hover:before:w-3 lg:hover:before:h-3
+  @apply z-20 relative font-(family-name:--outfit) text-main md:text-white hover:text-white text-sm sm:text-base font-medium cursor-pointer border border-main md:border-white py-2 px-4 max-[380px]:px-2.5 max-[380px]:py-1 rounded-lg hover:bg-(--main) hover:border-(--main) md:hover:before:absolute md:hover:before:-bottom-1 md:hover:before:-translate-x-1/4 md:hover:before:left-1/2 md:hover:before:rotate-45 md:hover:before:bg-(--main) md:hover:before:w-3 md:hover:before:h-3;
+}
+
+/* Container handles stacking context alignment */
+.range-slider-container {
+  position: relative;
+  width: 100%;
+  height: 8px;
+}
+
+/* Static base background track (The grey part) */
+.range-slider-track {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  border-radius: 9999px;
+  background: #f5f3f1;
+  z-index: 1;
+}
+
+/* Dynamic slider fill area (The orange part) */
+.range-slider-fill {
+  position: absolute;
+  height: 5px;
+  border-radius: 9999px;
+  background: #ff7101;
+  z-index: 2;
+}
+
+/* Stripped base input configuration overlays */
+.range-slider {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  outline: none;
+  -webkit-appearance: none;
+  background: none; /* Strips default background track fills */
+  pointer-events: none; /* Ignores clicks on empty transparent areas */
+  z-index: 3; /* Places elements above track levels */
+  margin: 0;
+}
+
+/* Restoring custom thumb shapes and colors */
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ff7101;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto; /* Reactivates drag capability on thumb exclusively */
+}
+
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ff7101;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto; /* Required override wrapper config for Firefox */
+  border: none;
+}
+
+/* Strips core layout tracking bugs across variant modern web engines */
+.range-slider::-webkit-slider-runnable-track,
+.range-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+/* Hide native scrollbars but preserve scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }

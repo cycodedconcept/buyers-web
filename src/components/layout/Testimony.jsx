@@ -6,7 +6,7 @@ const Testimony = () => {
 			<h2 className="font-fraunces text-[30px] text-heading text-center mb-4">
 				What Our Customers Say
 			</h2>
-			<div className="lg:hidden">
+			<div className="md:hidden">
 				<div className="flex flex-col gap-6 font-outfit">
 					{testimony.slice(0, 1).map((testi, index) => (
 						<div key={index} className="rounded-[20px] p-8 shadow-tiny">
@@ -32,7 +32,7 @@ const Testimony = () => {
 					))}
 				</div>
 			</div>
-			<div className="hidden lg:flex lg:gap-6 font-outfit">
+			<div className="hidden md:flex flex-wrap md:gap-6 font-outfit">
 				{testimony.map((testi, index) => (
 					<div key={index} className="rounded-[20px] p-8 shadow-tiny lg:flex-1">
 						<div className="flex items-center justify-between">

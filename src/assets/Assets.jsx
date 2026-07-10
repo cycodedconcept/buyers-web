@@ -7,6 +7,7 @@ import agentImg3 from "./8f428f1735b3116ad80e0fe7884d63ebec368c70.jpg";
 import agentImg4 from "./ebb811fcc4ee18ebe305b816b8de13ae57fb25df.jpg";
 import logoImg from "./logo.png";
 import logoWhiteImg from "./logoWhite.png";
+import logoImg2 from "./logoimg2.png";
 import featherImg from "./Taglinevector-Right.svg";
 import engineImg from "./engine.png";
 import engineMobileImg from "./engineMobile.png";
@@ -64,6 +65,7 @@ export {
 	heroBgImg,
 	logoImg,
 	logoWhiteImg,
+	logoImg2,
 	featherImg,
 	engineImg,
 	engineMobileImg,

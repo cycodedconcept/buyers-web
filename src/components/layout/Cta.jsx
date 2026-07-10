@@ -43,10 +43,10 @@ const Cta = ({ ctaType }) => {
 	if (ctaType === "single") {
 		return (
 			<>
-				<div className="container max-sm:py-16 px-4 max-sm:bg-heading">
+				<div className="container max-[799px]:py-16 px-4 max-[799px]:bg-heading">
 					<div className="w-full overflow-hidden max-sm:rounded-[20px] lg:h-121.25 md:rounded-tr-2xl md:rounded-br-2xl">
-						<div className="relative flex min-h-[320px] flex-col justify-center rounded-[20px] bg-gradient-to-r from-[#ff7101] to-[rgba(12,26,46,0.95)] px-5 py-8 lg:h-full lg:items-center lg:rounded-tr-2xl lg:rounded-br-2xl lg:bg-transparent lg:px-12 lg:py-0">
-							<div className="absolute inset-0 hidden lg:block">
+						<div className="relative flex min-h-80 flex-col justify-center rounded-[20px] bg-linear-to-r from-main to-[rgba(12,26,46,0.95)] px-5 py-8 lg:h-full lg:items-center lg:rounded-tr-2xl lg:rounded-br-2xl lg:bg-transparent lg:px-12 lg:py-0">
+							<div className="absolute inset-0 hidden md:block">
 								<div
 									className="h-full w-full bg-cover bg-center bg-no-repeat"
 									style={{ backgroundImage: `url(${ctaSingleImg})` }}
@@ -59,7 +59,7 @@ const Cta = ({ ctaType }) => {
 										Ready To Sell Across Nigeria?
 									</span>
 									<span className="hidden lg:inline">
-										Ready To Sell Auto Parts <br className="hidden lg:block" />{" "}
+										Ready To Sell Auto Parts <br className="hidden md:block" />{" "}
 										Across Nigeria?
 									</span>
 								</h2>
@@ -91,7 +91,7 @@ const Cta = ({ ctaType }) => {
 
 	return (
 		<>
-			<div className="container lg:py-10">
+			<div className="container md:px-3 md:py-10">
 				<div className="w-full h-123.75 overflow-hidden relative ">
 					<div
 						className="flex transition-transform ease-out duration-1000 w-full h-full relative z-10 before:content-[''] before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-[#00000033] before:z-10 before:rounded-2xl"
@@ -100,7 +100,7 @@ const Cta = ({ ctaType }) => {
 						{slides.map((slide, index) => (
 							<div
 								key={index}
-								className="w-full h-full flex items-end lg:items-center shrink-0 lg:rounded-2xl bg-cover bg-center bg-no-repeat max-sm:p-5 lg:px-10 overflow-hidden"
+								className="w-full h-full flex items-end md:items-center shrink-0 md:rounded-2xl bg-cover bg-center bg-no-repeat max-[799px]:p-5 md:px-10 overflow-hidden"
 								style={{ backgroundImage: `url(${ctaCarouselImg1})` }}
 							>
 								<div className="z-30 relative">
@@ -137,7 +137,7 @@ const Cta = ({ ctaType }) => {
 							</div>
 						))}
 					</div>
-					<div className="hidden lg:block absolute left-1/2 -translate-x-1/2 bottom-3 bg-white rounded-[20px] py-2 px-3 z-20">
+					<div className="hidden md:block absolute left-1/2 -translate-x-1/2 bottom-3 bg-white rounded-[20px] py-2 px-3 z-20">
 						{slides.map((_, index) => (
 							<button
 								key={index}

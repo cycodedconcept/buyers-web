@@ -1,11 +1,13 @@
-import {acCompressorImg,
-	alternatorImg,
-	engineOilFilterImg,
-	frontBrakePadImg,
-	rearShockAbsorberImg,
-	timingBeltImg,
-	starterMotorImg,
-	radiatorImg} from "../assets/Assets"
+import {
+  acCompressorImg,
+  alternatorImg,
+  engineOilFilterImg,
+  frontBrakePadImg,
+  rearShockAbsorberImg,
+  timingBeltImg,
+  starterMotorImg,
+  radiatorImg,
+} from "../assets/Assets";
 
 const products = [
   {
@@ -50,7 +52,7 @@ const products = [
     ownerStatus: "Verified seller",
     newPrice: 22000,
     oldPrice: 25000,
-    tag: "Refurbished",
+    tag: "OEM",
   },
   {
     img: timingBeltImg,
@@ -83,7 +85,7 @@ const products = [
     ownerStatus: "Verified seller",
     newPrice: 22000,
     oldPrice: 25000,
-    tag: "Refurbished",
+    tag: "OEM",
   },
   {
     img: radiatorImg,
@@ -127,7 +129,7 @@ const products = [
     ownerStatus: "Verified seller",
     newPrice: 22000,
     oldPrice: 25000,
-    tag: "Refurbished",
+    tag: "New",
   },
   {
     img: radiatorImg,
@@ -171,7 +173,7 @@ const products = [
     ownerStatus: "Verified seller",
     newPrice: 22000,
     oldPrice: 25000,
-    tag: "Refurbished",
+    tag: "OEM",
   },
 ];
 

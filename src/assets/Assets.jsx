@@ -54,6 +54,12 @@ import soldOutImg from "./soldOut.png";
 import offersImg from "./offers.png";
 import scaleImg from "./scale.png";
 import mechanicManImg from "./mechanicManImg.jpg";
+import pdfIconImg from "./pdfIcon.png";
+import mapLargeImg from "./mapLarge.png";
+import part1Img from "./part1.png";
+import part2Img from "./part2.jpg";
+import part3Img from "./part3.jpg";
+import part4Img from "./part4.png";
 
 export {
 	carSideImg,
@@ -112,4 +118,10 @@ export {
 	offersImg,
 	scaleImg,
 	mechanicManImg,
+	pdfIconImg,
+	mapLargeImg,
+	part1Img,
+	part2Img,
+	part3Img,
+	part4Img,
 };

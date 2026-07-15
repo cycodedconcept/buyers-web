@@ -3,26 +3,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
-:root {
-  /* Color */
-  --main: #ff7101;
-  --heading: #24272c;
-  --line: #ededed;
-  --text: #696665;
-  --on-surface: #161e2d;
-  --on-surface-v1: #5c6368;
-  --icon: #b6b6b6;
-
-  /* Font */
-  --fraunces: "Fraunces", serif;
-  --outfit: "Outfit", sans-serif;
-  --dm-sans: "DM Sans", sans-serif;
-
-  /* Font size */
-  --main-head: 70px;
-  --main-head-mob: 32px;
-}
-
 @theme {
   --font-fraunces: "Fraunces", serif;
   --font-outfit: "Outfit", sans-serif;
@@ -37,9 +17,11 @@
   --color-on-surface: #161e2d;
   --color-on-surface-v1: #5c6368;
   --color-icon: #b6b6b6;
+  --color-success: #7ED321;
 
   --shadow-tiny: 0 2px 6px 0 rgba(138, 61, 0, 0.06);
   --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  --shadow-4xl: 0 32px 48px 0px rgba(18, 18, 18, 0.1);
 
   --breakpoint-md: 800px;
 }
@@ -49,11 +31,15 @@ body {
 }
 
 .container {
-  @apply max-w-[1290px] w-full mx-auto;
+  @apply max-w-322.5 w-full mx-auto;
 }
 
 .hero-btn-options {
   @apply z-20 relative font-(family-name:--outfit) text-main md:text-white hover:text-white text-sm sm:text-base font-medium cursor-pointer border border-main md:border-white py-2 px-4 max-[380px]:px-2.5 max-[380px]:py-1 rounded-lg hover:bg-(--main) hover:border-(--main) md:hover:before:absolute md:hover:before:-bottom-1 md:hover:before:-translate-x-1/4 md:hover:before:left-1/2 md:hover:before:rotate-45 md:hover:before:bg-(--main) md:hover:before:w-3 md:hover:before:h-3;
+}
+
+button {
+  @apply cursor-pointer;
 }
 
 /* Container handles stacking context alignment */
@@ -88,6 +74,7 @@ body {
   width: 100%;
   height: 5px;
   outline: none;
+  appearance: none;
   -webkit-appearance: none;
   background: none; /* Strips default background track fills */
   pointer-events: none; /* Ignores clicks on empty transparent areas */

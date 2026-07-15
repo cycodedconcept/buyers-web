@@ -34,4 +34,4 @@ const TopInfo = () => {
 	);
 }
 
-export default TopInfo
+export default TopInfo;

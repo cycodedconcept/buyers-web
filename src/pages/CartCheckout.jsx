@@ -59,13 +59,13 @@ const CartCheckout = () => {
 
   return (
     <>
-      <div className="hidden md:block">
+      <div className="">
         <TopInfo />
       </div>
-      <Navbar isListingPage isHomepage={false} />
+      <Navbar isListingPage />
 
       <div className="container px-4 py-10 md:py-16">
-        <h1 className="text-center text-heading font-fraunces font-semibold text-[40px] mb-7">
+        <h1 className="text-start md:text-center text-heading font-fraunces font-semibold text-[40px] mb-7">
           {stepTitles[step]}
         </h1>
 

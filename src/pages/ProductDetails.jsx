@@ -628,6 +628,7 @@ const ProductDetails = () => {
                             className="border border-line p-3 font-outfit text-text text-sm placeholder:font-outfit placeholder:text-text placeholder:text-sm rounded-xl mt-1.5"
                           />
                         </div>
+                        <button className="text-white bg-main py-2.5 px-3.5 rounded-2xl font-outfit font-medium">Post Comment</button>
                       </div>
                     </form>
                   </div>

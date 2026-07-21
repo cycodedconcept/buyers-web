@@ -88,7 +88,7 @@ const About = () => {
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="pt-4">
-                      <h3 className="font-outfit text-lg font-semibold text-heading leading-[1]">
+                      <h3 className="font-outfit text-lg font-semibold text-heading leading-none">
                         {agent.name}
                       </h3>
                       <p className="font-outfit text-[13px] text-text mb-4">

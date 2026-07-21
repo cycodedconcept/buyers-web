@@ -76,7 +76,7 @@ const Blog = () => {
                   <span className="border-r-2 border-r-out-line pr-2 text-sm font-bold text-heading">
                     {author}
                   </span>
-                  <span className="pl-2 text-sm text-main">{duration}</span>
+                  <span className="pl-2 text-sm text-main">{duration} min</span>
                 </div>
                 <h4 className="text-[22px] font-medium leading-[1.1] text-heading line-clamp-2">
                   {title}

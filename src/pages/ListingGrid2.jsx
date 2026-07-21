@@ -371,7 +371,7 @@ const ListingGrid2 = () => {
                   <h5 className="font-medium text-heading text-base mb-4">
                     Featured
                   </h5>
-                  <div className="space-y-3 max-h-[560px] overflow-y-auto pr-2">
+                  <div className="space-y-3 max-h-140 overflow-y-auto pr-2">
                     {[
                       "OEM-Grade",
                       "Multi-vehicle Compatible",
@@ -430,7 +430,7 @@ const ListingGrid2 = () => {
                 <button className="px-2 py-2 border border-line rounded-lg">
                   <FaListUl size={16} className="text-icon" />
                 </button>
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <select
                     name=""
                     id=""
@@ -444,7 +444,7 @@ const ListingGrid2 = () => {
                   />
                 </div>
 
-                <div className="relative flex-shrink-0">
+                <div className="relative shrink-0">
                   <select
                     name=""
                     id=""
@@ -477,19 +477,19 @@ const ListingGrid2 = () => {
               <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
                 <LuChevronLeft size={20} />
               </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
+              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
                 1
               </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
+              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
                 2
               </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-main bg-main text-white">
+              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-main bg-main text-white">
                 3
               </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
+              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
                 4
               </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
+              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
                 ...
               </button>
               <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">

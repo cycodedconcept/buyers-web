@@ -55,6 +55,7 @@ import {
 } from "../assets/Assets";
 import { reviews } from "../data/reviews";
 import {parts} from "../data/parts";
+import ReplyForm from "../components/layout/ReplyForm";
 
 const ProductDetails = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -206,7 +207,7 @@ const ProductDetails = () => {
       <div className="hidden md:block">
         <TopInfo />
       </div>
-      <Navbar isListingPage={true} />
+      <Navbar isListingPage={true} isHomepage={false} />
       <div className="hidden md:block">
         <div className="container px-3 py-6 md:py-10">
           <div className="flex items-center gap-2 mb-6">
@@ -573,65 +574,7 @@ const ProductDetails = () => {
                       <IoArrowDownCircle size={16} className="text-main" />
                     </button>
                   </div>
-                  <div>
-                    <form>
-                      <h2 className="text-heading text-[30px] font-fraunces">
-                        Leave a reply
-                      </h2>
-                      <p className="text-text text-sm font-outfit">
-                        Your email address will not be published
-                      </p>
-                      <div className="space-y-4 mt-6">
-                        <div className="flex items-center gap-4">
-                          <div className="w-1/2">
-                            <label
-                              htmlFor="name"
-                              className="font-outfit text-heading font-medium text-sm"
-                            >
-                              Name
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Your name"
-                              className="w-full mt-1.5 py-3 px-4 rounded-xl border border-line font-outfit text-text text-sm placeholder:font-outfit placeholder:text-text placeholder:text-sm"
-                            />
-                          </div>
-                          <div className="w-1/2">
-                            <label
-                              htmlFor="email"
-                              className="font-outfit text-heading font-medium text-sm"
-                            >
-                              Email address
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Your email"
-                              className="w-full mt-1.5 py-3 px-4 rounded-xl border border-line font-outfit text-text text-sm placeholder:font-outfit placeholder:text-text placeholder:text-sm"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input type="checkbox" name="" id="" />
-                          <p className="font-outfit text-sm text-text">
-                            Save your name, email for the next time review
-                          </p>
-                        </div>
-                        <div className="flex flex-col">
-                          <label
-                            htmlFor="review"
-                            className="font-outfit text-heading text-sm font-medium"
-                          >
-                            Review
-                          </label>
-                          <textarea
-                            placeholder="Your Message:"
-                            className="border border-line p-3 font-outfit text-text text-sm placeholder:font-outfit placeholder:text-text placeholder:text-sm rounded-xl mt-1.5"
-                          />
-                        </div>
-                        <button className="text-white bg-main py-2.5 px-3.5 rounded-2xl font-outfit font-medium">Post Comment</button>
-                      </div>
-                    </form>
-                  </div>
+                  <ReplyForm/>
                 </div>
               </div>
             </div>

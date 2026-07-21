@@ -33,7 +33,7 @@ const ListingGrid = () => {
       </div>
       <div className="block sm:hidden">
         <div className="container px-4 bg-[#121212] py-5">
-          <div className="w-full min-h-[160px]">
+          <div className="w-full min-h-40">
             <img
               src={heroBgImg}
               alt="hero image"
@@ -52,7 +52,7 @@ const ListingGrid = () => {
       <div className="container px-4 py-10 bg-[#F9FAFB] block md:hidden">
         <div className="flex flex-col gap-5">
           <div className="flex items-center gap-4">
-            <div className="w-[48px] h-[48px] rounded-xl bg-[#24272C1A]"></div>
+            <div className="w-12 h-12 rounded-xl bg-[#24272C1A]"></div>
             <div>
               <h5 className="font-medium text-base font-outfit">
                 Top 1 Americas
@@ -64,7 +64,7 @@ const ListingGrid = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="w-[48px] h-[48px] rounded-xl bg-[#24272C1A]"></div>
+            <div className="w-12 h-12 rounded-xl bg-[#24272C1A]"></div>
             <div>
               <h5 className="font-medium text-base font-outfit">Parts Sold</h5>
               <p className="text-text text-xs font-outfit">Every 5 minute</p>
@@ -72,7 +72,7 @@ const ListingGrid = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="w-[48px] h-[48px] rounded-xl bg-[#24272C1A]"></div>
+            <div className="w-12 h-12 rounded-xl bg-[#24272C1A]"></div>
             <div>
               <h5 className="font-medium text-base font-outfit">Offers</h5>
               <p className="text-text text-xs font-outfit">
@@ -82,7 +82,7 @@ const ListingGrid = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="w-[48px] h-[48px] rounded-xl bg-[#24272C1A]"></div>
+            <div className="w-12 h-12 rounded-xl bg-[#24272C1A]"></div>
             <div>
               <h5 className="font-medium text-base font-outfit">Compare</h5>
               <p className="text-text text-xs font-outfit">

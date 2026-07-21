@@ -20,8 +20,10 @@
   --color-success: #7ED321;
 
   --shadow-tiny: 0 2px 6px 0 rgba(138, 61, 0, 0.06);
+  --shadow-md: 0 8px 20px 0px rgba(0, 0, 0, 0.05);
   --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
   --shadow-4xl: 0 32px 48px 0px rgba(18, 18, 18, 0.1);
+  --drop-shadow-normal: 0 4px 18px 0px rgba(0, 0, 0, 0.08);
 
   --breakpoint-md: 800px;
 }

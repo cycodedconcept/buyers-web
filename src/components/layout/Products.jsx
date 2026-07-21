@@ -3,15 +3,14 @@ import products from "../../data/products";
 import Button from "../ui/Button";
 import ProductCard from "../ui/ProductCard";
 import {
-  IoLocationOutline,
-  IoHeartOutline,
-  IoStarOutline,
+  
   IoChevronBack,
   IoChevronForward,
 } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
 import { ImEqualizer2 } from "react-icons/im";
-import { nairaFormatter } from "../../utils/utilityFunc";
+import Pagination from "../ui/Pagination";
+// import { nairaFormatter } from "../../utils/utilityFunc";
 
 const Products = ({
   limit = 8,
@@ -60,7 +59,7 @@ const Products = ({
               There Are Currently 17 Results
             </p>
             <div className="flex flex-nowrap items-center gap-5 mb-6 overflow-x-auto hide-scrollbar pb-2">
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -74,7 +73,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -88,7 +87,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -102,7 +101,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -116,7 +115,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -130,7 +129,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -144,7 +143,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -158,7 +157,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative flex-shrink-0">
+              <div className="relative shrink-0">
                 <select
                   name=""
                   id=""
@@ -172,7 +171,7 @@ const Products = ({
                 />
               </div>
 
-              <div className="relative w-[188px] flex-shrink-0 flex justify-center">
+              <div className="relative w-47 shrink-0 flex justify-center">
                 <select
                   name=""
                   id=""
@@ -191,43 +190,7 @@ const Products = ({
                 <ProductCard key={index} product={product} />
               ))}
             </div>
-            <div className="mt-8 hidden items-center justify-center gap-3 md:flex">
-              <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                <IoChevronBack size={20} />
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                1
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                2
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-main bg-main text-white">
-                3
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                4
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                ...
-              </button>
-              <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                <IoChevronForward size={20} />
-              </button>
-            </div>
-            <div className="mt-8 flex items-center justify-center gap-3 md:hidden">
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-main bg-main text-white">
-                1
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                2
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                3
-              </button>
-              <button className="flex h-12 min-w-[48px] items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                4
-              </button>
-            </div>
+           <Pagination/>
           </div>
         </>
       ) : (

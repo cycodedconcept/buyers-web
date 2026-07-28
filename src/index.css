@@ -1,1 +1,127 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --font-fraunces: "Fraunces", serif;
+  --font-outfit: "Outfit", sans-serif;
+  --font-dm-sans: "DM Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
+
+  --color-main: #ff7101;
+  --color-heading: #24272c;
+  --color-line: #ededed;
+  --color-out-line: #e4e4e4;
+  --color-text: #696665;
+  --color-on-surface: #161e2d;
+  --color-on-surface-v1: #5c6368;
+  --color-icon: #b6b6b6;
+  --color-success: #7ED321;
+
+  --shadow-tiny: 0 2px 6px 0 rgba(138, 61, 0, 0.06);
+  --shadow-md: 0 8px 20px 0px rgba(0, 0, 0, 0.05);
+  --shadow-3xl: 0 25px 50px 0 rgba(0, 0, 0, 0.1);
+  --shadow-4xl: 0 32px 48px 0px rgba(18, 18, 18, 0.1);
+  --drop-shadow-normal: 0 4px 18px 0px rgba(0, 0, 0, 0.08);
+
+  --breakpoint-md: 800px;
+}
+
+body {
+  @apply overflow-x-hidden;
+}
+
+.container {
+  @apply max-w-322.5 w-full mx-auto;
+}
+
+.hero-btn-options {
+  @apply z-20 relative font-(family-name:--outfit) text-main md:text-white hover:text-white text-sm sm:text-base font-medium cursor-pointer border border-main md:border-white py-2 px-4 max-[380px]:px-2.5 max-[380px]:py-1 rounded-lg hover:bg-(--main) hover:border-(--main) md:hover:before:absolute md:hover:before:-bottom-1 md:hover:before:-translate-x-1/4 md:hover:before:left-1/2 md:hover:before:rotate-45 md:hover:before:bg-(--main) md:hover:before:w-3 md:hover:before:h-3;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+/* Container handles stacking context alignment */
+.range-slider-container {
+  position: relative;
+  width: 100%;
+  height: 8px;
+}
+
+/* Static base background track (The grey part) */
+.range-slider-track {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  border-radius: 9999px;
+  background: #f5f3f1;
+  z-index: 1;
+}
+
+/* Dynamic slider fill area (The orange part) */
+.range-slider-fill {
+  position: absolute;
+  height: 5px;
+  border-radius: 9999px;
+  background: #ff7101;
+  z-index: 2;
+}
+
+/* Stripped base input configuration overlays */
+.range-slider {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: none; /* Strips default background track fills */
+  pointer-events: none; /* Ignores clicks on empty transparent areas */
+  z-index: 3; /* Places elements above track levels */
+  margin: 0;
+}
+
+/* Restoring custom thumb shapes and colors */
+.range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ff7101;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto; /* Reactivates drag capability on thumb exclusively */
+}
+
+.range-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background: #ff7101;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  pointer-events: auto; /* Required override wrapper config for Firefox */
+  border: none;
+}
+
+/* Strips core layout tracking bugs across variant modern web engines */
+.range-slider::-webkit-slider-runnable-track,
+.range-slider::-moz-range-track {
+  background: transparent;
+  border: none;
+}
+
+/* Hide native scrollbars but preserve scrolling */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

@@ -10,12 +10,14 @@ const BlogListCard = ({ post }) => {
         <img
           src={img}
           alt={title}
-          className="w-full h-118.25 object-cover rounded-2xl mb-5"
+          className="w-full h-56 sm:h-72 md:h-80 lg:h-118.25 object-cover rounded-2xl mb-5"
         />
       </Link>
 
       <h2 className="text-2xl font-semibold text-heading leading-snug mb-3">
-        <Link to="/blog-details" className="hover:text-main transition-colors">{title}</Link>
+        <Link to="/blog-details" className="hover:text-main transition-colors">
+          {title}
+        </Link>
       </h2>
 
       <div className="flex items-center gap-2.5 text-sm mb-3">

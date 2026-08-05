@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import {logoImg, logoImg2} from "../../assets/Assets";
 import Button from "../ui/Button";
 import { LuCarFront, LuMenu } from "react-icons/lu";
@@ -43,7 +43,7 @@ const Navbar = ({isHomepage = true, isListingPage = false}) => {
               Home
             </NavLink>
             <NavLink
-              to="/browse-parts"
+              to="/product-listing"
               className={({ isActive }) =>
                 `hover:text-main transition-colors ${isActive ? "text-main" : ""}`
               }
@@ -75,7 +75,7 @@ const Navbar = ({isHomepage = true, isListingPage = false}) => {
               Blog
             </NavLink>
             <NavLink
-              to="/contact"
+              to="/contact-us"
               className={({ isActive }) =>
                 `hover:text-main transition-colors ${isActive ? "text-main" : ""}`
               }
@@ -83,10 +83,12 @@ const Navbar = ({isHomepage = true, isListingPage = false}) => {
               Contact
             </NavLink>
           </nav>
-          <Button>
-            <LuCarFront className="inline-block mr-2" />
-            Register
-          </Button>
+          <Link to="/register">
+            <Button>
+              <LuCarFront className="inline-block mr-2" />
+              Register
+            </Button>
+          </Link>
         </div>
       </div>
     </>

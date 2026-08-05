@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import products from "../../data/products";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchAllProducts } from "../../features/products/productSlice";
 import Button from "../ui/Button";
 import ProductCard from "../ui/ProductCard";
-import {
-  
-  IoChevronBack,
-  IoChevronForward,
-} from "react-icons/io5";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
 import { ImEqualizer2 } from "react-icons/im";
 import Pagination from "../ui/Pagination";
@@ -26,6 +23,8 @@ const Products = ({
     if (window.innerWidth < 1024) return 6;
     return limit;
   });
+  const dispatch = useDispatch();
+  const { isLoading, error, products } = useSelector((state) => state.products);
 
   useEffect(() => {
     const updateVisibleCount = () => {
@@ -43,6 +42,10 @@ const Products = ({
 
     return () => window.removeEventListener("resize", updateVisibleCount);
   }, [limit]);
+
+  useEffect(() => {
+    dispatch(fetchAllProducts())
+  }, [dispatch])
 
   const productsArr = products.slice(0, visibleCount);
   return (
@@ -190,7 +193,7 @@ const Products = ({
                 <ProductCard key={index} product={product} />
               ))}
             </div>
-           <Pagination/>
+            <Pagination />
           </div>
         </>
       ) : (
@@ -241,8 +244,8 @@ const Products = ({
                   </button>
                 </div>
               )}
-              {productsArr.map((product, index) => (
-                <ProductCard key={index} product={product} />
+              {productsArr.map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           </div>

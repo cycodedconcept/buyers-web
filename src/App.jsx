@@ -23,7 +23,7 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/product-listing" element={<ListingGrid />} />
           <Route path="/product-listing-grid" element={<ListingGrid2 />} />
-          <Route path="/product-details" element={<ProductDetails />} />
+          <Route path="/product-details/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<CartCheckout />} />
           <Route path="/blog" element={<BlogList />} />
           <Route path="/blog-grid" element={<BlogGrid />} />
@@ -33,7 +33,7 @@ function App() {
           <Route path="/login" element={<Auth login={true} title="Login" />} />
           <Route path="/register" element={<Auth />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token?" element={<ResetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
         </Routes>
       </BrowserRouter>
     </>

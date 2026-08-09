@@ -7,4 +7,11 @@ const nairaFormatter = (koboValue) => {
   minimumFractionDigits: 0,
 }).format(nairaValue)};
 
-export {nairaFormatter}
+const cleanParams = (filters) => {
+  const newFiltersObject = Object.fromEntries(Object.entries(filters).filter(([, value]) => {
+    return value !== "";
+  }))
+  return newFiltersObject;
+}
+
+export {nairaFormatter, cleanParams}

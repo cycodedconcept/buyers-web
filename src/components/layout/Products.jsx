@@ -1,13 +1,26 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchAllProducts } from "../../features/products/productSlice";
+import {
+  fetchAllProducts,
+  setActiveFilter,
+} from "../../features/products/productSlice";
 import Button from "../ui/Button";
 import ProductCard from "../ui/ProductCard";
+import ProductLoadingGrid from "../ui/ProductLoadingGrid";
+import ProductErrorState from "../ui/ProductErrorState";
+import ProductEmptyState from "../ui/ProductEmptyState";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
 import { ImEqualizer2 } from "react-icons/im";
 import Pagination from "../ui/Pagination";
-// import { nairaFormatter } from "../../utils/utilityFunc";
+import { cleanParams } from "../../utils/utilityFunc";
+
+const CONDITIONOPTIONS = [
+  { label: "All", value: "" },
+  { label: "New", value: "new" },
+  { label: "Used", value: "used" },
+  { label: "OEM", value: "OEM"},
+];
 
 const Products = ({
   limit = 8,
@@ -24,7 +37,16 @@ const Products = ({
     return limit;
   });
   const dispatch = useDispatch();
-  const { isLoading, error, products } = useSelector((state) => state.products);
+  const { productsLoading, productsError, products, activeFilters } = useSelector(
+    (state) => state.products,
+  );
+
+  const handleConditionClick = (value) => {
+    const updatedFilters = { ...activeFilters, condition: value };
+
+    dispatch(setActiveFilter({ condition: value }));
+    dispatch(fetchAllProducts(cleanParams(updatedFilters)));
+  };
 
   useEffect(() => {
     const updateVisibleCount = () => {
@@ -44,8 +66,8 @@ const Products = ({
   }, [limit]);
 
   useEffect(() => {
-    dispatch(fetchAllProducts())
-  }, [dispatch])
+    dispatch(fetchAllProducts());
+  }, [dispatch]);
 
   const productsArr = products.slice(0, visibleCount);
   return (
@@ -188,7 +210,7 @@ const Products = ({
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative w-full">
+            <div className="grid auto-rows-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative w-full">
               {products.slice(0, 12).map((product, index) => (
                 <ProductCard key={index} product={product} />
               ))}
@@ -216,38 +238,53 @@ const Products = ({
             </div>
             {!fourGridDisplay && (
               <div className="flex gap-4 text-black font-outfit text-base mb-3 lg:mb-5">
-                <button className="hover:border-b-2 hover:border-b-main focus:border-b-2 focus:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer">
-                  All
-                </button>
-                <button className="hover:border-b-2 hover:border-b-main focus:border-b-2 focus:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer">
-                  New
-                </button>
-                <button className="hover:border-b-2 hover:border-b-main focus:border-b-2 focus:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer">
-                  Used
-                </button>
-                <button className="hover:border-b-2 hover:border-b-main focus:border-b-2 focus:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer">
-                  OEM
-                </button>
-                <button className="hover:border-b-2 hover:border-b-main focus:border-b-2 focus:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer">
-                  Port Harcourt
-                </button>
+                {CONDITIONOPTIONS.map((option) => (
+                  <button
+                    key={option.label}
+                    onClick={() => handleConditionClick(option.value)}
+                    className={`hover:border-b-2 hover:border-b-main pb-1 lg:pb-4 lg:pr-4 cursor-pointer ${activeFilters.condition === option.value ? "border-b border-b-main" : "border-0"} ${option.disabled ? "text-text" : "text-black"}`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
               </div>
             )}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 relative w-full">
-              {slider && (
-                <div className="absolute inset-y-0 -left-6 -right-6 z-20 flex items-center justify-between pointer-events-none">
-                  <button className="pointer-events-auto cursor-pointer flex h-12 w-12 items-center justify-center rounded-full bg-white text-heading shadow-lg">
-                    <IoChevronBack size={20} />
-                  </button>
-                  <button className="pointer-events-auto cursor-pointer flex h-12 w-12 items-center justify-center rounded-full bg-white text-heading shadow-lg">
-                    <IoChevronForward size={20} />
-                  </button>
-                </div>
-              )}
-              {productsArr.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            {productsLoading ? (
+              <ProductLoadingGrid count={visibleCount} />
+            ) : productsError ? (
+              <ProductErrorState
+                message={productsError}
+                onRetry={() =>
+                  dispatch(fetchAllProducts(cleanParams(activeFilters)))
+                }
+              />
+            ) : products.length === 0 ? (
+              <ProductEmptyState
+                title="No products match your filters"
+                message="Please try a different search or clear filters to discover available parts."
+                actionLabel="Clear filters"
+                onAction={() => {
+                  dispatch(setActiveFilter({ condition: "" }));
+                  dispatch(fetchAllProducts());
+                }}
+              />
+            ) : (
+              <div className="grid auto-rows-fr grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 relative w-full">
+                {slider && (
+                  <div className="absolute inset-y-0 -left-6 -right-6 z-20 flex items-center justify-between pointer-events-none">
+                    <button className="pointer-events-auto cursor-pointer flex h-12 w-12 items-center justify-center rounded-full bg-white text-heading shadow-lg">
+                      <IoChevronBack size={20} />
+                    </button>
+                    <button className="pointer-events-auto cursor-pointer flex h-12 w-12 items-center justify-center rounded-full bg-white text-heading shadow-lg">
+                      <IoChevronForward size={20} />
+                    </button>
+                  </div>
+                )}
+                {productsArr.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
           </div>
         </>
       )}

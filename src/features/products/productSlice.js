@@ -52,37 +52,65 @@ const productSlice = createSlice({
       category: "",
       minPriceKobo: "",
       maxPriceKobo: "",
-      condition: ""
+      condition: "",
     },
-    isLoading: false,
-    error: null
+    productsLoading: false,
+    productDetailsLoading: false,
+    productsError: null,
+    productDetailsError: null,
   },
-  reducers: {},
+  reducers: {
+    setActiveFilter: (state, action) => {
+      state.activeFilters = {
+        ...state.activeFilters,
+        ...action.payload,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchAllProducts.pending, (state) => {
+        state.productsLoading = true;
+        state.productsError = null;
+      })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
-        state.products = action.payload.data.products
+        state.productsLoading = false;
+        state.productsError = null;
+        state.products = action.payload.data.products;
+      })
+      .addCase(fetchAllProducts.rejected, (state, action) => {
+        state.productsLoading = false;
+        const payload = action.payload;
+        const errorMsg =
+          typeof payload === "string"
+            ? payload
+            : payload?.error?.message ||
+              payload?.message ||
+              "Something went wrong";
+        state.productsError = errorMsg;
+      })
+      .addCase(fetchProductDetails.pending, (state) => {
+        state.productDetailsLoading = true;
+        state.productDetailsError = null;
       })
       .addCase(fetchProductDetails.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.error = null;
-        state.productDetails = action.payload.data
+        state.productDetailsLoading = false;
+        state.productDetailsError = null;
+        state.productDetails = action.payload.data;
       })
-      .addMatcher((action) => action.type.startsWith("product/") && action.type.endsWith("/pending"), (state) => {
-        state.isLoading = true;
-        state.error = null
-      })
-      .addMatcher((action) => action.type.startsWith("product/") && action.type.endsWith("/rejected"), (state, action) => {
-        console.log("REJECTED PAYLOAD:", payload);
-        state.isLoading = false;
+      .addCase(fetchProductDetails.rejected, (state, action) => {
+        state.productDetailsLoading = false;
         const payload = action.payload;
-        const errorMsg = typeof payload === "string" ? payload : payload?.error?.message || payload?.message || "Something went wrong";
-        state.error = errorMsg
-      })
-  }
-})
+        const errorMsg =
+          typeof payload === "string"
+            ? payload
+            : payload?.error?.message ||
+              payload?.message ||
+              "Something went wrong";
+        state.productDetailsError = errorMsg;
+      });
+  },
+});
 
-
-export default productSlice.reducer
+export const { setActiveFilter } = productSlice.actions;
+export default productSlice.reducer;

@@ -178,6 +178,7 @@ const authSlice = createSlice({
         (state) => {
           state.isLoading = true;
           state.error = null;
+          state.isAuthenticated = false
         },
       )
       .addMatcher(
@@ -194,6 +195,7 @@ const authSlice = createSlice({
 
           // console.log("REJECTED PAYLOAD:", payload);
           state.isLoading = false;
+          state.isAuthenticated = false;
           state.error = errorMessage;
         },
       )

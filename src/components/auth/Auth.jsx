@@ -119,7 +119,7 @@ const Auth = ({ login = false, title = "Register" }) => {
       Swal.fire({
         icon: "error",
         title: login ? "Login failed" : "Registration failed",
-        text: login ? "Invalid email or password" : error,
+        text: error,
         confirmButtonColor: "#0273F9",
       }).then(() => {
         dispatch(resetStatus());

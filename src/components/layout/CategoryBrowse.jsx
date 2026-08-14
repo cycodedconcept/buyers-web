@@ -1,4 +1,7 @@
 import Button from "../ui/Button";
+import { useNavigate } from "react-router-dom";
+import {useDispatch} from "react-redux";
+import { setActiveFilter } from "../../features/products/productSlice";
 import {
 	engineImg,
 	engineMobileImg,
@@ -19,41 +22,50 @@ const categories = [
 		img: engineImg,
 		mobileImg: engineMobileImg,
 		label: "Engine",
+		value: "engine-components",
 		partNo: "2104 Parts",
 	},
 	{
 		img: brakeImg,
 		mobileImg: brakeMobileImg,
 		label: "Brakes",
+		value: "brake-system",
 		partNo: "1820 Parts",
 	},
 	{
 		img: electricImg,
 		mobileImg: electricalMobileImg,
 		label: "Electrical",
+		value: "electrical-lighting",
 		partNo: "980 Parts",
 	},
 	{
 		img: filterImg,
 		mobileImg: filterMobileImg,
 		label: "Filters & Fluids",
+		value: "filters",
 		partNo: "760 Parts",
 	},
 	{
 		img: suspensionImg,
 		mobileImg: suspensionMobileImg,
 		label: "Suspension",
+		value: "suspension-steering",
 		partNo: "640 Parts",
 	},
 	{
 		img: coolingImg,
 		mobileImg: coolingMobileImg,
 		label: "AC & Cooling",
+		value: "cooling",
 		partNo: "510 Parts",
 	},
 ];
 
 const CategoryBrowse = () => {
+	const dispatch = useDispatch();
+	// const {activeFilters} = useSelector(state => state.products)
+	const navigate = useNavigate();
 	const getMobileCategoryLabel = (label) => {
 		if (label.includes("Fluids")) {
 			return "Fluids";
@@ -61,6 +73,11 @@ const CategoryBrowse = () => {
 
 		return label;
 	};
+
+	const handleCategoryBrowse = (value) => {
+		dispatch(setActiveFilter({category: value}))
+		navigate("/product-listing")
+	}
 
 	return (
 		<>
@@ -82,6 +99,7 @@ const CategoryBrowse = () => {
 						{categories.map((category, index) => (
 							<div
 								key={index}
+								onClick={() => handleCategoryBrowse(category.value)}
 								className="flex flex-col items-center text-center font-outfit"
 							>
 								<div className="w-full h-26.75 bg-[#FF71010F] flex items-center justify-center rounded-2xl">
@@ -102,6 +120,7 @@ const CategoryBrowse = () => {
 						{categories.map((category, index) => (
 							<div
 								key={index}
+								onClick={() => handleCategoryBrowse(category.value)}
 								className="flex flex-col items-center text-center font-outfit"
 							>
 								<div className="w-full h-30 py-5 bg-[#FF71010F] flex flex-col items-center justify-center rounded-2xl">

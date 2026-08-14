@@ -62,35 +62,33 @@ import ReplyForm from "../components/layout/ReplyForm";
 import ProductLoadingGrid from "../components/ui/ProductLoadingGrid";
 import ProductErrorState from "../components/ui/ProductErrorState";
 import ProductEmptyState from "../components/ui/ProductEmptyState";
-console.log("PRODUCT DETAILS RENDERED");
 
 const ProductDetails = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuresShow, setFeaturesShow] = useState(null);
   const dispatch = useDispatch();
-  const { productDetailsLoading, productDetailsError, productDetails } = useSelector(
-    (state) => state.products,
-  );
+  const { productDetailsLoading, productDetailsError, productDetails, products } =
+    useSelector((state) => state.products);
   const { id } = useParams();
-  
 
   useEffect(() => {
-    if(!id) return;
+    if (!id) return;
     if (productDetails?.id && String(productDetails.id) === String(id)) return;
-    console.log("EFFECT FIRED — ID:", id);
 
     dispatch(fetchProductDetails(id));
-
-    console.log("DISPATCH CALLED");
-  }, [dispatch, id]);
-
-  console.log("productDetails:", productDetails);
+  }, [dispatch, id, productDetails.id]);
 
   const toggleAccordion = (id) => {
     setFeaturesShow(featuresShow === id ? null : id);
   };
 
-  const images = Array(6).fill(radiatorImg);
+  const images = productDetails?.photos?.length
+    ? [...productDetails.photos]
+        .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+        .map((photo) => photo.url)
+    : productDetails?.primaryImageUrl
+      ? [productDetails.primaryImageUrl]
+      : [];
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev === images.length - 1 ? 0 : prev + 1));
@@ -108,121 +106,105 @@ const ProductDetails = () => {
     {
       icon: <IoCarOutline size={20} />,
       label: "Condition",
-      value: "Brand New",
+      value: productDetails?.condition ?? "",
     },
     {
       icon: <PiHouseLineLight size={20} />,
       label: "Part Number",
-      value: "0986494062",
+      value: productDetails?.partNumber ?? "",
     },
-    { icon: <FaListOl size={20} />, label: "Brand", value: "Bosch" },
+    { icon: <FaListOl size={20} />, label: "Brand", value: "" },
     {
       icon: <PiCalendarCheck size={20} />,
       label: "Category",
-      value: "Brakes & Pads",
+      value: productDetails?.category?.name ?? "",
     },
     {
       icon: <PiSeatLight size={20} />,
       label: "Placement",
-      value: "Front Axle",
+      value: "",
     },
     {
       icon: <PiBuildingApartment size={20} />,
       label: "Material",
-      value: "Semi-Metallic",
+      value: "",
     },
     {
       icon: <PiRoadHorizonLight size={20} />,
       label: "Set Includes",
-      value: "4 pads + hardware",
+      value: "",
     },
     {
       icon: <PiStoolLight size={20} />,
       label: "Warranty",
-      value: "6 months",
+      value: "",
     },
     {
       icon: <PiGasPumpLight size={20} />,
       label: "Stock",
-      value: "8 units available",
+      value:
+        productDetails?.stockQty !== undefined &&
+        productDetails?.stockQty !== null
+          ? `${productDetails.stockQty} units available`
+          : "",
     },
     {
       icon: <PiDoorLight size={20} />,
       label: "Listed",
-      value: "June 2026",
+      value: "",
     },
     {
       icon: <IoColorFillOutline size={20} />,
       label: "Color",
-      value: "Blue, Gray",
+      value: "",
     },
     {
       icon: <PiGitBranchLight size={20} />,
       label: "Ships from",
-      value: "Lagos Island",
+      value: productDetails?.location ?? "",
     },
     {
       icon: <PiEngine size={20} />,
       label: "Delivery Estimate",
-      value: "Within 24 hours",
+      value: "",
     },
     {
       icon: <PiSteeringWheel size={20} />,
       label: "Year",
-      value: "2023",
+      value: "",
     },
   ];
 
   const partOverviewMobile = [
-    { label: "Condition:", value: "Brand New" },
-    { label: "Location:", value: "Ikeja, Lagos" },
-    { label: "Brand:", value: "Bosch" },
-    { label: "Category:", value: "Brakes & Pads" },
+    { label: "Condition:", value: productDetails?.condition ?? "" },
+    { label: "Location:", value: productDetails?.location ?? "" },
+    { label: "Brand:", value: "" },
+    { label: "Category:", value: productDetails?.category?.name ?? "" },
   ];
 
   const features = [
     {
       label: "Condition & Quality",
       featureValues: [
-        "Brand New",
-        "OEM Original",
-        "Sealed Original Box",
-        "Genuine Bosch",
-        "Includes Hardware Kit",
-        "Wearv Indicator Included",
+        productDetails?.condition ?? ""
       ],
     },
     {
       label: "Fitment",
       featureValues: [
-        "Brand New",
-        "OEM Original",
-        "Sealed Original Box",
-        "Genuine Bosch",
-        "Includes Hardware Kit",
-        "Wearv Indicator Included",
+        
       ],
     },
     {
       label: "Performance",
       featureValues: [
-        "Brand New",
-        "OEM Original",
-        "Sealed Original Box",
-        "Genuine Bosch",
-        "Includes Hardware Kit",
-        "Wearv Indicator Included",
+        
       ],
     },
     {
       label: "Packaging & Extras",
       featureValues: [
-        "Brand New",
-        "OEM Original",
-        "Sealed Original Box",
-        "Genuine Bosch",
-        "Includes Hardware Kit",
-        "Wearv Indicator Included",
+        
       ],
     },
   ];
@@ -264,9 +246,6 @@ const ProductDetails = () => {
                   <div className="flex items-center gap-1">
                     <p className="font-outfit md:font-fraunces text-[30px] text-main">
                       {nairaFormatter(productDetails.priceKobo)}
-                    </p>
-                    <p className="font-outfit text-lg text-icon">
-                      {nairaFormatter(productDetails.priceKobo + 1000000)}
                     </p>
                   </div>
                   <div>
@@ -375,31 +354,12 @@ const ProductDetails = () => {
                   </h2>
                   <div className="text-text text-sm font-outfit">
                     <p className="leading-[1.4] mb-3">
-                      This is a genuine Bosch OEM front brake pad set, sourced
-                      directly from an authorised distributor and supplied in
-                      original sealed packaging. Suitable for Toyota Corolla
-                      models from 2018 through to 2022, including the E210
-                      generation. The set includes all four front pads with
-                      integrated wear indicators and anti-squeal shims.
+                      {productDetails.description}
                     </p>
-                    <p className="leading-[1.4] mb-3">
-                      These pads are manufactured to OEM specification — same
-                      friction compound, same dimensions, and same fitment
-                      tolerances as the pads fitted at the factory. No
-                      modifications required for installation.
-                    </p>
-                    <p className="leading-[1.4] mb-4.5">
-                      All listings from this seller have been verified by the
-                      AutoParts admin team. Part number has been
-                      cross-referenced against the Toyota OEM catalogue.
-                      Compatibility information was confirmed by the seller and
-                      is the seller's responsibility per AutoParts platform
-                      terms.
-                    </p>
-                    <button className="flex items-center gap-2 border border-line py-2 px-3 rounded-lg bg-[#fcfcfc] text-sm text-heading font-outfit font-medium mb-3">
+                    {/* <button className="flex items-center gap-2 border border-line py-2 px-3 rounded-lg bg-[#fcfcfc] text-sm text-heading font-outfit font-medium mb-3">
                       <img src={pdfIconImg} alt="" className="w-7.5 h-7.5 " />
                       Download brochure
-                    </button>
+                    </button> */}
                   </div>
                   <hr className="text-line my-9" />
                   <div>
@@ -498,7 +458,7 @@ const ProductDetails = () => {
                     </h2>
                     <p className="flex items-center gap-2 font-outfit font-medium text-sm text-text mb-5">
                       <PiBookOpenTextLight />
-                      Complex 4, Taiwo Aina Road, Ikeja, Lagos
+                      {productDetails?.location ?? ""}
                     </p>
                     <img
                       src={mapLargeImg}
@@ -518,14 +478,14 @@ const ProductDetails = () => {
                         </div>
                         <div>
                           <h2 className="font-outfit text-[70px] font-bold text-main">
-                            4.8
+                            {productDetails?.seller?.rating ?? 0}
                           </h2>
                         </div>
                         <div className="font-outfit text-heading text-sm">
                           <p className="">Overall Rating</p>
                           <p>
                             Base on{" "}
-                            <span className="font-semibold">372 Reviews</span>
+                            <span className="font-semibold">0 Reviews</span>
                           </p>
                         </div>
                       </div>
@@ -549,10 +509,10 @@ const ProductDetails = () => {
                     </div>
                     <div className="font-outfit my-12">
                       <h4 className="text-heading font-semibold text-xl">
-                        34 Ratings and Reviews
+                        {productDetails?.reviews ?? 0} Ratings and Reviews
                       </h4>
                       <div>
-                        {reviews.map((review, index) => (
+                        {productDetails?.reviews?.map((review, index) => (
                           <div
                             key={index}
                             className="py-5 space-y-4 border-b border-b-line last:border-b-0"
@@ -603,8 +563,17 @@ const ProductDetails = () => {
                         ))}
                       </div>
                       <button className="text-main font-outfit text-base font-medium flex items-center gap-1.5 mt-4">
-                        <span>View More Reviews</span>
-                        <IoArrowDownCircle size={16} className="text-main" />
+                        {productDetails?.reviews?.length > 3 ? (
+                          <>
+                            <span>View More Reviews</span>
+                            <IoArrowDownCircle
+                              size={16}
+                              className="text-main"
+                            />
+                          </>
+                        ) : (
+                          ""
+                        )}
                       </button>
                     </div>
                     <ReplyForm />
@@ -672,21 +641,21 @@ const ProductDetails = () => {
                     </p>
                   </div>
                   <div className="flex flex-col gap-7 mt-5">
-                    {parts.map((part, index) => (
+                    {products?.slice(0,3)?.map((product, index) => (
                       <div key={index} className="flex gap-3">
                         {/* <div className="w-32.5 h-24.5 bg-[#0000000D] rounded-2xl relative"> */}
                         <img
-                          src={part.image}
-                          alt={`${part.name} image`}
+                          src={product.primaryImageUrl}
+                          alt={`${product.title} image`}
                           className="w-32.5 h-24.5 rounded-2xl"
                         />
                         {/* </div> */}
                         <div>
                           <p className="text-heading text-base leading-[1.4] mb-2">
-                            {part.name}
+                            {product.title}
                           </p>
                           <p className="font-bold text-heading">
-                            {nairaFormatter(part.price)}
+                            {nairaFormatter(product.priceKobo)}
                           </p>
                         </div>
                       </div>

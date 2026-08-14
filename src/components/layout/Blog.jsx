@@ -89,7 +89,7 @@ const Blog = () => {
           })}
         </div>
         <div className="hidden md:flex md:items-center md:gap-5 lg:gap-8">
-          {blogs.map((blog, index) => (
+          {blogs.slice(0,3).map((blog, index) => (
             <div key={index} className="font-outfit cursor-pointer space-y-2.5">
               <div className="relative h-67.5 w-full rounded-2xl bg-[#eaeaea]">
                 <img

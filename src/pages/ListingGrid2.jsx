@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {useDispatch, useSelector} from "react-redux";
+import { fetchAllProducts } from "../features/products/productSlice";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
 import {
@@ -10,26 +12,29 @@ import {
 import { CgMenuGridO } from "react-icons/cg";
 import { FaListUl, FaTimes } from "react-icons/fa";
 import ProductCard from "../components/ui/ProductCard";
-import products from "../data/products";
 import Footer from "../components/layout/Footer";
 
 const ListingGrid2 = () => {
   const minLimit = 2000;
   const maxLimit = 2025;
-  const totalRange = maxLimit - minLimit; // 25 years
+  const totalRange = maxLimit - minLimit;
 
-  // 1. Separate states for your two thumbs
   const [startYear, setStartYear] = useState(2005);
   const [endYear, setEndYear] = useState(2020);
 
-  // 2. Identify active minimum and maximum to prevent fill reversal
   const currentMin = Math.min(startYear, endYear);
   const currentMax = Math.max(startYear, endYear);
 
-  // 3. Compute structural left position and width percentage dynamically
   const leftPercent = ((currentMin - minLimit) / totalRange) * 100;
   const widthPercent =
     ((currentMax - minLimit) / totalRange) * 100 - leftPercent;
+
+    const {products} = useSelector(state => state.products);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      dispatch(fetchAllProducts())
+    }, [dispatch])
 
   return (
     <>
@@ -50,7 +55,7 @@ const ListingGrid2 = () => {
               Listing Grid
             </h2>
             <p className="text-text text-sm font-outfit mb-6">
-              There Are Currently 17 Results
+              There Are Currently {products.length} Results
             </p>
 
             <div className="mb-7 w-full">

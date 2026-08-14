@@ -12,7 +12,7 @@ const BlogList = () => {
   return (
     <>
       <TopInfo />
-      <Navbar isListingPage isHomepage={false} />
+      <Navbar isListingPage />
       <div className="container px-4">
         <BlogTitle />
 
@@ -34,7 +34,7 @@ const BlogList = () => {
       <div className="hidden lg:block">
         <Footer />
       </div>
-      <div className="block lg:hidden">
+      <div className="block lg:hidden mt-8">
         <Footer listingGridMobile={true} />
       </div>
     </>

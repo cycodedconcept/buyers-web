@@ -5,15 +5,20 @@ const socials = [<FaFacebookF/>, <FaLinkedinIn/>, <FaXTwitter/>, <FaSquareInstag
 const BlogTitle = ({ heading = "Blog List" }) => {
   return (
     <>
-      <div className="flex items-center justify-between my-10">
-        <h2 className="text-heading font-fraunces font-semibold text-[40px]">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between my-5 md:my-10">
+        <h2 className="text-heading font-fraunces font-semibold text-[28px] sm:text-[32px] md:text-[40px]">
           {heading}
         </h2>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 md:gap-4">
           <p className="font-outfit text-sm text-heading">Share this page:</p>
-          <div className="flex items-center gap-3">
-            {socials.map(icon => (
-              <button key={icon} className="w-10 h-10 flex items-center justify-center rounded-full border border-line text-base text-heading">
+          <div className="flex items-center gap-2.5 md:gap-3">
+            {socials.map((icon, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label="Share"
+                className="w-7 h-7 md:w-10 md:h-10 flex items-center justify-center rounded-full border border-line text-sm md:text-base text-heading hover:border-main hover:text-main transition-colors"
+              >
                 {icon}
               </button>
             ))}

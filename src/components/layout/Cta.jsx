@@ -124,10 +124,10 @@ const Cta = ({ ctaType }) => {
 									</p>
 									<div className="flex items-center gap-2 my-3">
 										<h2 className="font-outfit lg:font-fraunces font-bold text-[30px] text-main">
-											{nairaFormatter.format(22000)}
+											{nairaFormatter(2200000)}
 										</h2>
 										<p className="font-outfit text-base text-icon">
-											<strike>{nairaFormatter.format(25000)}</strike>
+											<strike>{nairaFormatter(2500000)}</strike>
 										</p>
 									</div>
 									<Button className="px-14 py-2.5 max-sm:w-full flex justify-center">

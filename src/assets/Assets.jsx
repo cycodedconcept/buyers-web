@@ -7,7 +7,6 @@ import agentImg3 from "./8f428f1735b3116ad80e0fe7884d63ebec368c70.jpg";
 import agentImg4 from "./ebb811fcc4ee18ebe305b816b8de13ae57fb25df.jpg";
 import logoImg from "./logo.png";
 import logoWhiteImg from "./logoWhite.png";
-import logoImg2 from "./logoimg2.png";
 import featherImg from "./Taglinevector-Right.svg";
 import engineImg from "./engine.png";
 import engineMobileImg from "./engineMobile.png";
@@ -48,7 +47,6 @@ import customerImg from "./customer.jpg";
 import blogImg1 from "./blogImg1.jpg";
 import blogImg2 from "./blogImg2.jpg";
 import blogImg3 from "./blogImg3.jpg";
-import recentBlogImg1 from "./066d6b1ff9e770459d27417c5b77ef0386573565.jpg";
 import recentBlogImg2 from "./160ba362fd3e84e45aed8a97511553fbd8ef9f48.jpg";
 import recentBlogImg3 from "./8208fa824d636ccfed2b031fb6a4e36864e5eab4.jpg";
 import recentBlogImg4 from "./8f428f1735b3116ad80e0fe7884d63ebec368c70.jpg";
@@ -59,15 +57,17 @@ import soldOutImg from "./soldOut.png";
 import offersImg from "./offers.png";
 import scaleImg from "./scale.png";
 import mechanicManImg from "./mechanicManImg.jpg";
-import pdfIconImg from "./pdfIcon.png";
-import mapLargeImg from "./mapLarge.png";
-import part1Img from "./part1.png";
-import part2Img from "./part2.jpg";
-import part3Img from "./part3.jpg";
-import part4Img from "./part4.png";
-import contactMapImg from "./contactMap.png";
-import authImg from "./authImg.png";
-import steeringIcon from "./steeringIcon.png";
+import mapPlaceholderImg from "./mapPlaceholder.svg";
+import authPlaceholderImg from "./authPlaceholder.svg";
+
+const recentBlogImg1 = blogImg1;
+const mapLargeImg = mapPlaceholderImg;
+const contactMapImg = mapPlaceholderImg;
+const authImg = authPlaceholderImg;
+const part1Img = frontBrakePadImg;
+const part2Img = alternatorImg;
+const part3Img = engineOilFilterImg;
+const part4Img = radiatorImg;
 
 export {
   carSideImg,
@@ -79,7 +79,6 @@ export {
   heroBgImg,
   logoImg,
   logoWhiteImg,
-  logoImg2,
   featherImg,
   engineImg,
   engineMobileImg,
@@ -131,13 +130,11 @@ export {
   offersImg,
   scaleImg,
   mechanicManImg,
-  pdfIconImg,
   mapLargeImg,
   part1Img,
   part2Img,
   part3Img,
   part4Img,
 	contactMapImg,
-	authImg,
-	steeringIcon
+	authImg
 };

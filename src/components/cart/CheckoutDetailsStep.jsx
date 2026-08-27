@@ -1,61 +1,103 @@
-import { useState } from "react";
-import { IoChevronDown } from "react-icons/io5";
+import { useEffect, useState } from "react";
 import { PiCreditCardLight } from "react-icons/pi";
-import { LuTicket } from "react-icons/lu";
 import QuantityStepper from "./QuantityStepper";
-
-const formatUSD = (value) => `$${value.toFixed(2)}`;
+import { nairaFormatter } from "../../utils/utilityFunc";
 
 const FieldLabel = ({ children }) => (
-  <label className="block font-outfit text-xs font-semibold text-text tracking-wide uppercase mb-1.5">
+  <label className="mb-1.5 block font-outfit text-xs font-semibold uppercase tracking-wide text-text">
     {children}
   </label>
 );
 
 const inputClasses =
-  "w-full rounded-lg border border-out-line py-3 px-4 font-outfit text-sm text-heading placeholder:text-text placeholder:font-outfit outline-none focus:border-heading transition-colors";
+  "w-full rounded-lg border border-out-line px-4 py-3 font-outfit text-sm text-heading placeholder:font-outfit placeholder:text-text outline-none transition-colors focus:border-heading";
+
+const createInitialFormState = (initialValues = {}) => ({
+  firstName: initialValues.firstName || "",
+  lastName: initialValues.lastName || "",
+  email: initialValues.email || "",
+  phone: initialValues.phone || "",
+  addressLabel: initialValues.addressLabel || "",
+  street: initialValues.street || "",
+  city: initialValues.city || "",
+  state: initialValues.state || "",
+});
 
 const CheckoutDetailsStep = ({
   cartItems,
+  summary,
   onIncrease,
   onDecrease,
   onCheckout,
+  isUpdating = false,
+  orderError = null,
+  initialValues = {},
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState("paystack");
-  const [useBillingAddress, setUseBillingAddress] = useState(false);
-  const [couponInput, setCouponInput] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState({
-    code: "JenkateMW",
-    amount: 25,
-  });
+  const [formState, setFormState] = useState(createInitialFormState(initialValues));
+  const [formError, setFormError] = useState(null);
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
-  const discount = appliedCoupon ? appliedCoupon.amount : 0;
-  const total = subtotal - discount;
+  useEffect(() => {
+    setFormState(createInitialFormState(initialValues));
+  }, [initialValues]);
 
-  const handleApplyCoupon = () => {
-    if (!couponInput.trim()) return;
-    setAppliedCoupon({ code: couponInput.trim(), amount: 25 });
-    setCouponInput("");
+  const handleFieldChange = (event) => {
+    const { name, value } = event.target;
+
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
   };
+
+  const handleSubmit = () => {
+    const requiredFields = [
+      { key: "addressLabel", label: "address label" },
+      { key: "street", label: "street address" },
+      { key: "city", label: "city" },
+      { key: "state", label: "state" },
+      { key: "phone", label: "phone number" },
+    ];
+
+    const missingField = requiredFields.find(
+      ({ key }) => !formState[key]?.trim(),
+    );
+
+    if (missingField) {
+      setFormError(`Please enter your ${missingField.label}.`);
+      return;
+    }
+
+    setFormError(null);
+    onCheckout({
+      paymentMethod: "paystack",
+      deliveryAddress: {
+        label: formState.addressLabel.trim(),
+        street: formState.street.trim(),
+        city: formState.city.trim(),
+        state: formState.state.trim(),
+        phone: formState.phone.trim(),
+      },
+    });
+  };
+
+  const errorMessage = formError || orderError;
 
   return (
     <>
-      <div className="hidden md:flex gap-10 items-start my-16">
-        {/* Left column - forms */}
-        <div className="max-w-207.5 w-full flex flex-col gap-8">
-          <div className="border border-text rounded-2xl p-8.5">
-            <h2 className="font-outfit text-heading text-2xl font-medium mb-6">
-              Contact Infomation
+      <div className="my-16 hidden items-start gap-10 md:flex">
+        <div className="max-w-207.5 flex w-full flex-col gap-8">
+          <div className="rounded-2xl border border-text p-8.5">
+            <h2 className="mb-6 font-outfit text-2xl font-medium text-heading">
+              Contact Information
             </h2>
-            <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="mb-5 grid grid-cols-2 gap-4">
               <div>
                 <FieldLabel>First Name</FieldLabel>
                 <input
                   type="text"
+                  name="firstName"
+                  value={formState.firstName}
+                  onChange={handleFieldChange}
                   placeholder="First name"
                   className={inputClasses}
                 />
@@ -64,15 +106,21 @@ const CheckoutDetailsStep = ({
                 <FieldLabel>Last Name</FieldLabel>
                 <input
                   type="text"
+                  name="lastName"
+                  value={formState.lastName}
+                  onChange={handleFieldChange}
                   placeholder="Last name"
                   className={inputClasses}
                 />
               </div>
             </div>
             <div className="mb-5">
-              <FieldLabel>Phone Number</FieldLabel>
+              <FieldLabel>Phone Number *</FieldLabel>
               <input
                 type="tel"
+                name="phone"
+                value={formState.phone}
+                onChange={handleFieldChange}
                 placeholder="Phone number"
                 className={inputClasses}
               />
@@ -81,175 +129,110 @@ const CheckoutDetailsStep = ({
               <FieldLabel>Email Address</FieldLabel>
               <input
                 type="email"
-                placeholder="Your Email"
+                name="email"
+                value={formState.email}
+                onChange={handleFieldChange}
+                placeholder="Your email"
                 className={inputClasses}
               />
             </div>
           </div>
 
-          <div className="border border-text rounded-2xl p-8.5">
-            <h2 className="font-outfit text-heading text-2xl font-medium mb-6">
-              Shipping Address
+          <div className="rounded-2xl border border-text p-8.5">
+            <h2 className="mb-6 font-outfit text-2xl font-medium text-heading">
+              Delivery Address
             </h2>
+            <div className="mb-5">
+              <FieldLabel>Address Label *</FieldLabel>
+              <input
+                type="text"
+                name="addressLabel"
+                value={formState.addressLabel}
+                onChange={handleFieldChange}
+                placeholder="Workshop, home, office..."
+                className={`${inputClasses} border-text`}
+              />
+            </div>
             <div className="mb-5">
               <FieldLabel>Street Address *</FieldLabel>
               <input
                 type="text"
-                placeholder="Stress Address"
+                name="street"
+                value={formState.street}
+                onChange={handleFieldChange}
+                placeholder="12 Adeola Odeku Street"
                 className={`${inputClasses} border-text`}
               />
             </div>
-            <div className="mb-5">
-              <FieldLabel>Country *</FieldLabel>
-              <button
-                type="button"
-                className={`${inputClasses} flex items-center justify-between text-left border-text`}
-              >
-                <span className="text-text">Country</span>
-                <IoChevronDown className="text-text" size={16} />
-              </button>
-            </div>
-            <div className="mb-5">
-              <FieldLabel>Town / City *</FieldLabel>
-              <input
-                type="text"
-                placeholder="Town / City"
-                className={`${inputClasses} border-text`}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <FieldLabel>State</FieldLabel>
+                <FieldLabel>Town / City *</FieldLabel>
                 <input
                   type="text"
-                  placeholder="State"
+                  name="city"
+                  value={formState.city}
+                  onChange={handleFieldChange}
+                  placeholder="Ikeja"
+                  className={`${inputClasses} border-text`}
+                />
+              </div>
+              <div>
+                <FieldLabel>State *</FieldLabel>
+                <input
+                  type="text"
+                  name="state"
+                  value={formState.state}
+                  onChange={handleFieldChange}
+                  placeholder="Lagos"
                   className={inputClasses}
                 />
               </div>
-              <div>
-                <FieldLabel>Zip Code</FieldLabel>
-                <input
-                  type="text"
-                  placeholder="Zip Code"
-                  className={`${inputClasses} text-text`}
-                />
-              </div>
             </div>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={useBillingAddress}
-                onChange={(e) => setUseBillingAddress(e.target.checked)}
-                className="w-4.5 h-4.5 rounded border-line accent-heading"
-              />
-              <span className="font-outfit text-sm text-text">
-                Use a different billing address (optional)
-              </span>
-            </label>
           </div>
 
-          <div className="border border-text rounded-2xl p-8.5">
-            <h2 className="font-outfit text-heading text-2xl font-medium mb-6">
+          <div className="rounded-2xl border border-text p-8.5">
+            <h2 className="mb-6 font-outfit text-2xl font-medium text-heading">
               Payment Method
             </h2>
-            <div className="flex flex-col gap-3 mb-5">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod("paystack")}
-                className={`flex items-center justify-between rounded-xl border px-4 py-4 ${
-                  paymentMethod === "paystack"
-                    ? "border-heading bg-[#F3F5F7]"
-                    : "border-heading"
-                }`}
-              >
+            <div className="rounded-xl border border-heading bg-[#F3F5F7] px-4 py-4">
+              <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === "paystack"
-                        ? "border-heading"
-                        : "border-heading"
-                    }`}
-                  >
-                    {paymentMethod === "paystack" && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-heading" />
-                    )}
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-heading">
+                    <div className="h-2.5 w-2.5 rounded-full bg-heading" />
                   </div>
-                  <span className="font-outfit text-heading font-semibold text-sm">
-                    Pay with paystack
-                  </span>
-                </div>
-                {/* <PiCreditCardLight className="text-heading" size={20} /> */}
-              </button>
-              <button
-                type="button"
-                onClick={() => setPaymentMethod("bank")}
-                className={`flex items-center justify-between rounded-xl border border-heading px-4 py-4 ${paymentMethod === "paypal" ? "bg-[#F3F5F7]" : ""}`}
-              >
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                      paymentMethod === "bank"
-                        ? "border-heading"
-                        : "border-heading"
-                    }`}
-                  >
-                    {paymentMethod === "bank" && (
-                      <div className="w-2.5 h-2.5 rounded-full bg-heading" />
-                    )}
+                  <div>
+                    <p className="font-outfit text-sm font-semibold text-heading">
+                      Paystack hosted checkout
+                    </p>
+                    <p className="mt-1 font-outfit text-sm text-text">
+                      We&apos;ll redirect you to Paystack after order creation.
+                    </p>
                   </div>
-                  <span className="font-outfit text-heading font-semibold text-sm">
-                    Bank Transfer
-                  </span>
                 </div>
-              </button>
+                <PiCreditCardLight className="text-heading" size={22} />
+              </div>
             </div>
-
-            {paymentMethod === "card" && (
-              <>
-                <hr className="text-text my-5" />
-                <div className="mb-5">
-                  <FieldLabel>Card Number</FieldLabel>
-                  <input
-                    type="text"
-                    placeholder="1234 1234 1234"
-                    className={`${inputClasses} border-text`}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <FieldLabel>Expiration Date</FieldLabel>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className={`${inputClasses} border-text`}
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>CVC</FieldLabel>
-                    <input
-                      type="text"
-                      placeholder="CVC Code"
-                      className={`${inputClasses} border-text`}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
           </div>
+
+          {errorMessage ? (
+            <div className="rounded-2xl border border-[#F0B7B7] bg-[#FFF5F5] px-5 py-4 font-outfit text-sm text-[#B43C3C]">
+              {errorMessage}
+            </div>
+          ) : null}
 
           <button
             type="button"
-            onClick={onCheckout}
-            className="w-full rounded-2xl bg-main text-white font-outfit font-semibold text-base py-4"
+            onClick={handleSubmit}
+            disabled={isUpdating}
+            className="w-full rounded-2xl bg-main py-4 font-outfit text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Checkout
+            {isUpdating ? "Creating order..." : "Create Order"}
           </button>
         </div>
 
-        {/* Right column - order summary */}
         <div className="flex-1">
-          <div className="border border-text rounded-2xl p-8">
-            <h2 className="font-outfit text-heading text-2xl font-medium mb-6">
+          <div className="rounded-2xl border border-text p-8">
+            <h2 className="mb-6 font-outfit text-2xl font-medium text-heading">
               Order Summary
             </h2>
 
@@ -257,105 +240,75 @@ const CheckoutDetailsStep = ({
               {cartItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex gap-4 pb-5 mb-5 border-b border-line last:border-b-0 last:mb-0 last:pb-0"
+                  className="mb-5 flex gap-4 border-b border-line pb-5 last:mb-0 last:border-b-0 last:pb-0"
                 >
                   <img
-                    src={item.image}
-                    alt={item.name}
-                    className="w-20 h-24 rounded-lg bg-[#F4F4F4] object-contain p-1.5 shrink-0"
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="h-24 w-20 shrink-0 rounded-lg bg-[#F4F4F4] object-contain p-1.5"
                   />
                   <div className="flex-1">
-                    <div className="flex items-start justify-between mb-1">
-                      <p className="font-outfit text-heading font-medium text-sm">
-                        {item.name}
+                    <div className="mb-1 flex items-start justify-between">
+                      <p className="font-outfit text-sm font-medium text-heading">
+                        {item.title}
                       </p>
-                      <p className="font-outfit text-heading font-semibold text-sm">
-                        {formatUSD(item.price * item.quantity)}
+                      <p className="font-outfit text-sm font-semibold text-heading">
+                        {nairaFormatter(item.lineTotalKobo)}
                       </p>
                     </div>
-                    <p className="font-outfit text-text text-sm mb-2.5">
-                      Quality: Excellence
+                    <p className="mb-2.5 font-outfit text-sm text-text">
+                      Condition: {item.condition}
                     </p>
                     <QuantityStepper
                       size="sm"
                       quantity={item.quantity}
-                      onIncrease={() => onIncrease(item.id)}
-                      onDecrease={() => onDecrease(item.id)}
+                      onIncrease={() => onIncrease(item)}
+                      onDecrease={() => onDecrease(item)}
+                      disabled={isUpdating}
+                      disableDecrease={item.quantity <= 1}
+                      disableIncrease={
+                        item.stockQty !== null &&
+                        item.stockQty !== undefined &&
+                        item.quantity >= item.stockQty
+                      }
                     />
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center gap-3 mb-5">
-              <input
-                type="text"
-                value={couponInput}
-                onChange={(e) => setCouponInput(e.target.value)}
-                placeholder="Input"
-                className="flex-1 rounded-lg border border-line py-3 px-4 font-outfit text-sm text-heading placeholder:text-text outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleApplyCoupon}
-                className="rounded-lg bg-main text-white font-outfit font-semibold text-sm px-6 py-3 shrink-0"
-              >
-                Apply
-              </button>
-            </div>
+            <hr className="mb-5 text-line" />
 
-            {appliedCoupon && (
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  <LuTicket className="text-icon" size={18} />
-                  <span className="font-outfit text-heading text-sm">
-                    {appliedCoupon.code}
-                  </span>
-                </div>
-                <p className="font-outfit text-success text-sm font-medium">
-                  -{formatUSD(appliedCoupon.amount)}{" "}
-                  <button
-                    type="button"
-                    onClick={() => setAppliedCoupon(null)}
-                    className="underline"
-                  >
-                    Remove
-                  </button>
-                </p>
-              </div>
-            )}
-
-            <hr className="text-line mb-5" />
-
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-line">
-              <span className="font-outfit text-text text-sm">Delivery</span>
-              <span className="font-outfit text-heading text-sm font-medium">
-                Free
+            <div className="mb-3 flex items-center justify-between border-b border-line pb-3">
+              <span className="font-outfit text-sm text-text">Delivery</span>
+              <span className="font-outfit text-sm font-medium text-heading">
+                {summary.deliveryFeeKobo > 0
+                  ? nairaFormatter(summary.deliveryFeeKobo)
+                  : "Free"}
               </span>
             </div>
-            <div className="flex items-center justify-between pb-3 mb-3 border-b border-line">
-              <span className="font-outfit text-text text-sm">Subtotal</span>
-              <span className="font-outfit text-heading text-sm font-semibold">
-                {formatUSD(subtotal)}
+            <div className="mb-3 flex items-center justify-between border-b border-line pb-3">
+              <span className="font-outfit text-sm text-text">Subtotal</span>
+              <span className="font-outfit text-sm font-semibold text-heading">
+                {nairaFormatter(summary.subtotalKobo)}
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="font-outfit text-heading text-lg font-bold">
+              <span className="font-outfit text-lg font-bold text-heading">
                 Total
               </span>
-              <span className="font-outfit text-heading text-lg font-bold">
-                {formatUSD(total)}
+              <span className="font-outfit text-lg font-bold text-heading">
+                {nairaFormatter(summary.totalKobo)}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="md:hidden my-10">
-        {/* Contact Information */}
-        <div className="border border-out-line p-4.5 mb-7 rounded-2xl">
-          <h2 className="font-outfit text-[#1A1A1A] text-lg font-medium mb-4">
-            Contact Infomation
+      <div className="my-10 md:hidden">
+        <div className="mb-7 rounded-2xl border border-out-line p-4.5">
+          <h2 className="mb-4 font-outfit text-lg font-medium text-[#1A1A1A]">
+            Contact Information
           </h2>
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-3">
@@ -363,6 +316,9 @@ const CheckoutDetailsStep = ({
                 <FieldLabel>First Name</FieldLabel>
                 <input
                   type="text"
+                  name="firstName"
+                  value={formState.firstName}
+                  onChange={handleFieldChange}
                   placeholder="First name"
                   className={inputClasses}
                 />
@@ -371,15 +327,21 @@ const CheckoutDetailsStep = ({
                 <FieldLabel>Last Name</FieldLabel>
                 <input
                   type="text"
+                  name="lastName"
+                  value={formState.lastName}
+                  onChange={handleFieldChange}
                   placeholder="Last name"
                   className={inputClasses}
                 />
               </div>
             </div>
             <div>
-              <FieldLabel>Phone Number</FieldLabel>
+              <FieldLabel>Phone Number *</FieldLabel>
               <input
                 type="tel"
+                name="phone"
+                value={formState.phone}
+                onChange={handleFieldChange}
                 placeholder="Phone number"
                 className={inputClasses}
               />
@@ -388,186 +350,102 @@ const CheckoutDetailsStep = ({
               <FieldLabel>Email Address</FieldLabel>
               <input
                 type="email"
-                placeholder="Your Email"
+                name="email"
+                value={formState.email}
+                onChange={handleFieldChange}
+                placeholder="Your email"
                 className={inputClasses}
               />
             </div>
           </div>
         </div>
 
-        {/* Shipping Address */}
-        <div className="border border-out-line rounded-2xl p-4.5 mb-7">
-          <h2 className="font-outfit text-[#1A1A1A] text-lg font-medium mb-4">
-            Shipping Address
+        <div className="mb-7 rounded-2xl border border-out-line p-4.5">
+          <h2 className="mb-4 font-outfit text-lg font-medium text-[#1A1A1A]">
+            Delivery Address
           </h2>
           <div className="space-y-5">
             <div>
-              <FieldLabel>Street Address *</FieldLabel>
+              <FieldLabel>Address Label *</FieldLabel>
               <input
                 type="text"
-                placeholder="Stress Address"
+                name="addressLabel"
+                value={formState.addressLabel}
+                onChange={handleFieldChange}
+                placeholder="Workshop, home, office..."
                 className={`${inputClasses} border-[#E8E8E8]`}
               />
             </div>
             <div>
-              <FieldLabel>Country *</FieldLabel>
-              <button
-                type="button"
-                className={`${inputClasses} flex items-center justify-between text-left border-[#E8E8E8]`}
-              >
-                <span className="text-[#6B6B6B]">Country</span>
-                <IoChevronDown className="text-[#6B6B6B]" size={16} />
-              </button>
-            </div>
-            <div>
-              <FieldLabel>Town / City *</FieldLabel>
+              <FieldLabel>Street Address *</FieldLabel>
               <input
                 type="text"
-                placeholder="Town / City"
+                name="street"
+                value={formState.street}
+                onChange={handleFieldChange}
+                placeholder="12 Adeola Odeku Street"
                 className={`${inputClasses} border-[#E8E8E8]`}
               />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <FieldLabel>State</FieldLabel>
+                <FieldLabel>Town / City *</FieldLabel>
                 <input
                   type="text"
-                  placeholder="State"
-                  className={inputClasses}
+                  name="city"
+                  value={formState.city}
+                  onChange={handleFieldChange}
+                  placeholder="Ikeja"
+                  className={`${inputClasses} border-[#E8E8E8]`}
                 />
               </div>
               <div>
-                <FieldLabel>Zip Code</FieldLabel>
+                <FieldLabel>State *</FieldLabel>
                 <input
                   type="text"
-                  placeholder="Zip Code"
-                  className={`${inputClasses} text-[#6B6B6B]`}
+                  name="state"
+                  value={formState.state}
+                  onChange={handleFieldChange}
+                  placeholder="Lagos"
+                  className={inputClasses}
                 />
               </div>
             </div>
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={useBillingAddress}
-                onChange={(e) => setUseBillingAddress(e.target.checked)}
-                className="w-4 h-4 rounded border-[#CBCBCB] accent-[#1A1A1A]"
-              />
-              <span className="font-outfit text-sm text-[#6B6B6B]">
-                Use a different billing address (optional)
-              </span>
-            </label>
           </div>
         </div>
 
-        {/* Payment Method */}
-        <div className="border rounded-2xl border-out-line p-4 mb-7">
-          <h2 className="font-outfit text-[#1A1A1A] text-lg font-medium mb-4">
+        <div className="mb-7 rounded-2xl border border-out-line p-4">
+          <h2 className="mb-4 font-outfit text-lg font-medium text-[#1A1A1A]">
             Payment Method
           </h2>
-          <div className="flex flex-col gap-3 mb-4">
-            <button
-              type="button"
-              onClick={() => setPaymentMethod("paystack")}
-              className={`flex items-center justify-between rounded-xl border px-4 py-3.5 ${
-                paymentMethod === "paystack"
-                  ? "border-[#1A1A1A] bg-[#F3F5F7]"
-                  : "border-out-line"
-              }`}
-            >
+          <div className="rounded-xl border border-[#1A1A1A] bg-[#F3F5F7] px-4 py-3.5">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    paymentMethod === "card"
-                      ? "border-[#1A1A1A]"
-                      : "border-out-line"
-                  }`}
-                >
-                  {paymentMethod === "paystack" && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A]" />
-                  )}
+                <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#1A1A1A]">
+                  <div className="h-2.5 w-2.5 rounded-full bg-[#1A1A1A]" />
                 </div>
-                <span className="font-outfit text-[#1A1A1A] font-semibold text-sm">
-                  Pay with paystack
-                </span>
+                <div>
+                  <p className="font-outfit text-sm font-semibold text-[#1A1A1A]">
+                    Paystack hosted checkout
+                  </p>
+                  <p className="mt-1 font-outfit text-sm text-[#6B6B6B]">
+                    Redirect after order creation.
+                  </p>
+                </div>
               </div>
               <PiCreditCardLight className="text-[#1A1A1A]" size={20} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setPaymentMethod("bank")}
-              className={`flex items-center justify-between rounded-xl border  px-4 py-3.5 ${
-                paymentMethod === "bank"
-                  ? "bg-[#F3F5F7] border-[#1A1A1A]"
-                  : "border-out-line"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
-                    paymentMethod === "bank"
-                      ? "border-[#1A1A1A]"
-                      : "border-out-line"
-                  }`}
-                >
-                  {paymentMethod === "bank" && (
-                    <div className="w-2.5 h-2.5 rounded-full bg-[#1A1A1A]" />
-                  )}
-                </div>
-                <span className="font-outfit text-[#1A1A1A] font-semibold text-sm">
-                  Bank Transfer
-                </span>
-              </div>
-            </button>
-          </div>
-
-          {paymentMethod === "card" && (
-            <>
-              <hr className="border-[#E8E8E8] my-4" />
-              <div className="space-y-4">
-                <div>
-                  <FieldLabel>Card Number</FieldLabel>
-                  <input
-                    type="text"
-                    placeholder="1234 1234 1234"
-                    className={`${inputClasses} border-[#E8E8E8]`}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <FieldLabel>Expiration Date</FieldLabel>
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className={`${inputClasses} border-[#E8E8E8]`}
-                    />
-                  </div>
-                  <div>
-                    <FieldLabel>CVC</FieldLabel>
-                    <input
-                      type="text"
-                      placeholder="CVC Code"
-                      className={`${inputClasses} border-[#E8E8E8]`}
-                    />
-                  </div>
-                </div>
-              </div>
-            </>
-          )}
-          {/* Checkout Button - Mobile */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={onCheckout}
-              className="w-full rounded-2xl bg-main text-white font-outfit font-semibold text-base py-4"
-            >
-              Checkout
-            </button>
+            </div>
           </div>
         </div>
 
-        {/* Order Summary - Mobile */}
-        <div className="p-4 rounded-2xl border border-out-line bg-[#F9FAFB]">
-          <h2 className="font-outfit text-[#1A1A1A] text-lg font-medium mb-4">
+        {errorMessage ? (
+          <div className="mb-7 rounded-2xl border border-[#F0B7B7] bg-[#FFF5F5] px-4 py-4 font-outfit text-sm text-[#B43C3C]">
+            {errorMessage}
+          </div>
+        ) : null}
+
+        <div className="rounded-2xl border border-out-line bg-[#F9FAFB] p-4">
+          <h2 className="mb-4 font-outfit text-lg font-medium text-[#1A1A1A]">
             Order Summary
           </h2>
 
@@ -575,86 +453,70 @@ const CheckoutDetailsStep = ({
             {cartItems.map((item) => (
               <div key={item.id} className="flex gap-4 pb-3">
                 <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-10 h-10 rounded-sm bg-[#F4F4F4] object-contain p-1.5 shrink-0"
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="h-10 w-10 shrink-0 rounded-sm bg-[#F4F4F4] object-contain p-1.5"
                 />
-                <div className="flex-1 mb-2.5">
-                  <p className="font-inter text-heading font-semibold text-sm">
-                    {item.name}
+                <div className="mb-2.5 flex-1">
+                  <p className="font-outfit text-sm font-semibold text-heading">
+                    {item.title}
                   </p>
-                  <div className="flex items-center justify-between">
-                    <p className="font-outfit text-text text-sm">
-                      Qty: {item.quantity}
-                    </p>
-                    <p className="font-outfit text-heading font-semibold text-sm">
-                      {formatUSD(item.price * item.quantity)}
-                    </p>
+                  <div className="mt-2 flex items-center justify-between gap-4">
+                    <QuantityStepper
+                      size="sm"
+                      quantity={item.quantity}
+                      onIncrease={() => onIncrease(item)}
+                      onDecrease={() => onDecrease(item)}
+                      disabled={isUpdating}
+                      disableDecrease={item.quantity <= 1}
+                      disableIncrease={
+                        item.stockQty !== null &&
+                        item.stockQty !== undefined &&
+                        item.quantity >= item.stockQty
+                      }
+                    />
+                    <span className="font-outfit text-base font-semibold text-heading">
+                      {nairaFormatter(item.lineTotalKobo)}
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <hr className="border-out-line mb-4" />
 
-          <div className="mt-4">
-            {/* <div className="flex items-center gap-3 mb-4">
-              <input
-                type="text"
-                value={couponInput}
-                onChange={(e) => setCouponInput(e.target.value)}
-                placeholder="Input"
-                className="flex-1 rounded-lg border border-[#CBCBCB] py-3 px-4 font-outfit text-sm text-[#1A1A1A] placeholder:text-[#6B6B6B] outline-none"
-              />
-              <button
-                type="button"
-                onClick={handleApplyCoupon}
-                className="rounded-lg bg-[#1A1A1A] text-white font-outfit font-semibold text-sm px-6 py-3 shrink-0"
-              >
-                Apply
-              </button>
-            </div> */}
+          <hr className="mb-4 border-out-line" />
 
-            {appliedCoupon && (
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  {/* <LuTicket className="text-[#6B6B6B]" size={18} /> */}
-                  <span className="font-inter text-[#6b6b6b] text-sm">
-                    Applied Coupon
-                  </span>
-                </div>
-                <p className="font-inter text-success text-sm font-medium">
-                  -{formatUSD(appliedCoupon.amount)}{" "}
-                  <button
-                    type="button"
-                    onClick={() => setAppliedCoupon(null)}
-                    className="underline text-[#EF4444] font-inter ms-0.5"
-                  >
-                    Remove
-                  </button>
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-inter text-[#6B6B6B] text-sm">
-                  Delivery
-                </span>
-                <span className="font-inter text-[#1A1A1A] text-sm font-medium">
-                  Free
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-inter text-heading text-lg font-bold">
-                  Total
-                </span>
-                <span className="font-inter text-heading text-lg font-bold">
-                  {formatUSD(total)}
-                </span>
-              </div>
-            </div>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-outfit text-sm text-text">Delivery</span>
+            <span className="font-outfit text-sm font-medium text-heading">
+              {summary.deliveryFeeKobo > 0
+                ? nairaFormatter(summary.deliveryFeeKobo)
+                : "Free"}
+            </span>
           </div>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="font-outfit text-sm text-text">Subtotal</span>
+            <span className="font-outfit text-sm font-semibold text-heading">
+              {nairaFormatter(summary.subtotalKobo)}
+            </span>
+          </div>
+          <div className="mb-4 flex items-center justify-between">
+            <span className="font-outfit text-lg font-bold text-heading">
+              Total
+            </span>
+            <span className="font-outfit text-lg font-bold text-heading">
+              {nairaFormatter(summary.totalKobo)}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isUpdating}
+            className="w-full rounded-2xl bg-main py-4 font-outfit text-base font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isUpdating ? "Creating order..." : "Create Order"}
+          </button>
         </div>
       </div>
     </>

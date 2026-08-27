@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductDetails } from "../features/products/productSlice";
+import {
+  addCartItem,
+  selectCartItems,
+  selectCartLoading,
+} from "../features/cart/cartSlice";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
 import Products from "../components/layout/Products";
 import Footer from "../components/layout/Footer";
-import { LuChevronRight } from "react-icons/lu";
+import Breadcrumbs from "../components/ui/Breadcrumbs";
 import {
   PiGitBranchLight,
   PiSpeedometerLight,
@@ -52,7 +57,6 @@ import { FaListOl } from "react-icons/fa6";
 import { nairaFormatter } from "../utils/utilityFunc";
 import {
   mapLargeImg,
-  pdfIconImg,
   radiatorImg,
   mechanicManImg,
 } from "../assets/Assets";
@@ -62,21 +66,53 @@ import ReplyForm from "../components/layout/ReplyForm";
 import ProductLoadingGrid from "../components/ui/ProductLoadingGrid";
 import ProductErrorState from "../components/ui/ProductErrorState";
 import ProductEmptyState from "../components/ui/ProductEmptyState";
+import Swal from "sweetalert2";
 
 const ProductDetails = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuresShow, setFeaturesShow] = useState(null);
+  const [selectedQuantity, setSelectedQuantity] = useState(1);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { productDetailsLoading, productDetailsError, productDetails, products } =
     useSelector((state) => state.products);
+  const { token } = useSelector((state) => state.auth);
+  const cartItems = useSelector(selectCartItems);
+  const cartLoading = useSelector(selectCartLoading);
   const { id } = useParams();
+  const productDetailsId = productDetails?.id;
+  const reviewList = productDetails?.reviews ?? [];
+  const compatibilityList = productDetails?.compatibility ?? [];
+  const compatibilityLabel = compatibilityList.length
+    ? compatibilityList
+        .map((item) =>
+          `${item.make ?? ""} ${item.model ?? ""} ${item.yearFrom ?? ""}-${item.yearTo ?? ""}`.trim(),
+        )
+        .join(", ")
+    : "";
+  const compatibilityYears = compatibilityList.length
+    ? compatibilityList
+        .map((item) => {
+          if (item.yearFrom && item.yearTo) {
+            return `${item.yearFrom}-${item.yearTo}`;
+          }
+          return item.yearFrom || item.yearTo || "";
+        })
+        .filter(Boolean)
+        .join(", ")
+    : "";
 
   useEffect(() => {
     if (!id) return;
-    if (productDetails?.id && String(productDetails.id) === String(id)) return;
+    if (productDetailsId && String(productDetailsId) === String(id)) return;
 
     dispatch(fetchProductDetails(id));
-  }, [dispatch, id, productDetails.id]);
+  }, [dispatch, id, productDetailsId]);
+
+  useEffect(() => {
+    setCurrentSlide(0);
+    setSelectedQuantity(1);
+  }, [productDetailsId]);
 
   const toggleAccordion = (id) => {
     setFeaturesShow(featuresShow === id ? null : id);
@@ -102,6 +138,101 @@ const ProductDetails = () => {
     setCurrentSlide(slideIndex);
   };
 
+  const isOutOfStock = Number(productDetails?.stockQty) === 0;
+  const isAlreadyInCart = cartItems.some(
+    (item) => String(item.product?.id) === String(productDetails?.id),
+  );
+  const addToCartButtonLabel = isAlreadyInCart
+    ? "Already in Cart"
+    : isOutOfStock
+      ? "Out of Stock"
+      : cartLoading
+        ? "Updating..."
+        : "Add to Cart";
+  const desktopAddToCartClasses = isAlreadyInCart
+    ? "bg-success disabled:opacity-100"
+    : "bg-success disabled:opacity-60";
+  const mobileAddToCartClasses = isAlreadyInCart
+    ? "bg-success disabled:opacity-100"
+    : "bg-main disabled:opacity-60";
+
+  const increaseSelectedQuantity = () => {
+    setSelectedQuantity((currentQuantity) => {
+      if (
+        productDetails?.stockQty !== undefined &&
+        productDetails?.stockQty !== null
+      ) {
+        if (productDetails.stockQty <= 0) {
+          return currentQuantity;
+        }
+
+        return Math.min(currentQuantity + 1, productDetails.stockQty);
+      }
+
+      return currentQuantity + 1;
+    });
+  };
+
+  const decreaseSelectedQuantity = () => {
+    setSelectedQuantity((currentQuantity) => Math.max(1, currentQuantity - 1));
+  };
+
+  const getCartErrorMessage = (error) =>
+    typeof error === "string"
+      ? error
+      : error?.error?.message || error?.message || "Something went wrong";
+
+  const handleAddToCart = async ({ redirectToCart = false } = {}) => {
+    if (!productDetails?.id) return;
+
+    if (isAlreadyInCart) {
+      if (redirectToCart) {
+        navigate("/cart");
+      }
+      return;
+    }
+
+    if (!token) {
+      Swal.fire({
+        icon: "info",
+        title: "Login required",
+        text: "Please log in to add items to your cart.",
+        confirmButtonColor: "#0273F9",
+      }).then(() => {
+        navigate("/login");
+      });
+      return;
+    }
+
+    try {
+      await dispatch(
+        addCartItem({
+          productId: productDetails.id,
+          quantity: selectedQuantity,
+        }),
+      ).unwrap();
+
+      if (redirectToCart) {
+        navigate("/cart");
+        return;
+      }
+
+      Swal.fire({
+        icon: "success",
+        title: "Added to cart",
+        text: `${selectedQuantity} item${selectedQuantity > 1 ? "s" : ""} added to your cart.`,
+        confirmButtonColor: "#0273F9",
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Unable to add to cart",
+        text: getCartErrorMessage(error),
+        confirmButtonColor: "#0273F9",
+      });
+    }
+  };
+
   const partOverview = [
     {
       icon: <IoCarOutline size={20} />,
@@ -122,7 +253,7 @@ const ProductDetails = () => {
     {
       icon: <PiSeatLight size={20} />,
       label: "Placement",
-      value: "",
+      value: compatibilityLabel,
     },
     {
       icon: <PiBuildingApartment size={20} />,
@@ -171,14 +302,14 @@ const ProductDetails = () => {
     {
       icon: <PiSteeringWheel size={20} />,
       label: "Year",
-      value: "",
+      value: compatibilityYears,
     },
   ];
 
   const partOverviewMobile = [
     { label: "Condition:", value: productDetails?.condition ?? "" },
     { label: "Location:", value: productDetails?.location ?? "" },
-    { label: "Brand:", value: "" },
+    { label: "Brand:", value: productDetails?.seller?.businessName ?? "" },
     { label: "Category:", value: productDetails?.category?.name ?? "" },
   ];
 
@@ -191,21 +322,18 @@ const ProductDetails = () => {
     },
     {
       label: "Fitment",
-      featureValues: [
-        
-      ],
+      featureValues: compatibilityLabel ? [compatibilityLabel] : [],
     },
     {
       label: "Performance",
-      featureValues: [
-        
-      ],
+      featureValues: productDetails?.description ? [productDetails.description] : [],
     },
     {
       label: "Packaging & Extras",
-      featureValues: [
-        
-      ],
+      featureValues:
+        productDetails?.stockQty !== undefined && productDetails?.stockQty !== null
+          ? [`${productDetails.stockQty} units available`]
+          : [],
     },
   ];
 
@@ -218,17 +346,26 @@ const ProductDetails = () => {
       {productDetailsLoading ? (
         <ProductLoadingGrid />
       ) : productDetailsError ? (
-        <ProductErrorState />
+        <ProductErrorState
+          message={productDetailsError}
+          onRetry={() => id && dispatch(fetchProductDetails(id))}
+        />
       ) : !productDetails ? (
-        <ProductEmptyState />
+        <ProductEmptyState
+          title="Product not found"
+          message="We couldn't find the product details for this listing."
+        />
       ) : (
         <div className="hidden md:block">
           <div className="container px-3 py-6 md:py-10">
-            <div className="flex items-center gap-2 mb-6">
-              <span className="font-semibold text-main text-xs">Home</span>
-              <LuChevronRight className="text-icon" size={8} />
-              <span className="text-icon text-xs">Used parts for sale</span>
-            </div>
+            <Breadcrumbs
+              className="mb-6"
+              items={[
+                { label: "Home", to: "/" },
+                { label: "Used parts for sale", to: "/product-listing-grid" },
+                { label: productDetails.title },
+              ]}
+            />
             <div className="flex items-start justify-between my-6">
               <div className="max-w-207.5 w-full">
                 <h1 className="text-heading font-outfit md:font-fraunces font-semibold md:text-[40px]">
@@ -249,19 +386,41 @@ const ProductDetails = () => {
                     </p>
                   </div>
                   <div>
-                    <button className="py-2 px-4 rounded-lg bg-[#EDF2F4] text-heading font-semibold text-[20px] flex items-center cursor-pointer">
-                      <PiMinusLight size={12.6} color="#121212" />
-                      <span className="mx-7">1</span>
-                      <PiPlusLight size={12.6} color="#121212" />
-                    </button>
+                    <div className="py-2 px-4 rounded-lg bg-[#EDF2F4] text-heading font-semibold text-[20px] flex items-center">
+                      <button
+                        type="button"
+                        onClick={decreaseSelectedQuantity}
+                        className="cursor-pointer"
+                      >
+                        <PiMinusLight size={12.6} color="#121212" />
+                      </button>
+                      <span className="mx-7">{selectedQuantity}</span>
+                      <button
+                        type="button"
+                        onClick={increaseSelectedQuantity}
+                        className="cursor-pointer"
+                      >
+                        <PiPlusLight size={12.6} color="#121212" />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <button className="w-1/2 rounded-2xl flex justify-center font-medium text-base text-white py-3 bg-main">
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart({ redirectToCart: true })}
+                    disabled={isOutOfStock || cartLoading}
+                    className="w-1/2 rounded-2xl flex justify-center font-medium text-base text-white py-3 bg-main disabled:cursor-not-allowed disabled:opacity-60"
+                  >
                     Buy Now
                   </button>
-                  <button className="w-1/2 rounded-2xl flex justify-center font-medium text-base text-white py-3 bg-success">
-                    Add to Cart
+                  <button
+                    type="button"
+                    onClick={() => handleAddToCart()}
+                    disabled={isAlreadyInCart || isOutOfStock || cartLoading}
+                    className={`w-1/2 rounded-2xl flex justify-center font-medium text-base text-white py-3 disabled:cursor-not-allowed ${desktopAddToCartClasses}`}
+                  >
+                    {addToCartButtonLabel}
                   </button>
                 </div>
               </div>
@@ -286,9 +445,9 @@ const ProductDetails = () => {
                 {images.map((image, index) => (
                   <img
                     key={index}
-                    src={productDetails.primaryImageUrl}
-                    alt=""
-                    className="w-full h-full object-contain"
+                    src={image}
+                    alt={`${productDetails.title} ${index + 1}`}
+                    className="w-full h-full shrink-0 object-contain"
                   />
                 ))}
                 <div className="absolute left-0 w-full pointer-events-none top-1/2 -translate-y-1/2">
@@ -468,7 +627,7 @@ const ProductDetails = () => {
                   </div>
                   <hr className="text-line my-9" />
                   <div>
-                    <h2 className="text-heading text-[30px] font-fraunces">
+                    <h2 className="text-heading text-[25px] font-fraunces">
                       Car User Reviews & Rating
                     </h2>
                     <div className="space-y-4">
@@ -485,7 +644,9 @@ const ProductDetails = () => {
                           <p className="">Overall Rating</p>
                           <p>
                             Base on{" "}
-                            <span className="font-semibold">0 Reviews</span>
+                            <span className="font-semibold">
+                              {reviewList.length} Reviews
+                            </span>
                           </p>
                         </div>
                       </div>
@@ -509,10 +670,10 @@ const ProductDetails = () => {
                     </div>
                     <div className="font-outfit my-12">
                       <h4 className="text-heading font-semibold text-xl">
-                        {productDetails?.reviews ?? 0} Ratings and Reviews
+                        {reviewList.length} Ratings and Reviews
                       </h4>
                       <div>
-                        {productDetails?.reviews?.map((review, index) => (
+                        {reviewList.map((review, index) => (
                           <div
                             key={index}
                             className="py-5 space-y-4 border-b border-b-line last:border-b-0"
@@ -563,7 +724,7 @@ const ProductDetails = () => {
                         ))}
                       </div>
                       <button className="text-main font-outfit text-base font-medium flex items-center gap-1.5 mt-4">
-                        {productDetails?.reviews?.length > 3 ? (
+                        {reviewList.length > 3 ? (
                           <>
                             <span>View More Reviews</span>
                             <IoArrowDownCircle
@@ -591,7 +752,7 @@ const ProductDetails = () => {
                       />
                       <div>
                         <h4 className="text-heading text-xl font-medium mb-2">
-                          {productDetails.seller.businessName}
+                          {productDetails?.seller?.businessName ?? "Verified Seller"}
                         </h4>
                         <p className="inline-flex items-center gap-1.5 text-xs text-success py-1.5 px-2.5 bg-[#7ED3211A] border border-[#7ED32124] rounded-full">
                           <IoShieldCheckmarkOutline />
@@ -603,7 +764,7 @@ const ProductDetails = () => {
                     <div>
                       <p className="flex items-center gap-2 font-outfit font-medium text-sm text-text mb-3">
                         <PiBookOpenTextLight />
-                        Complex 4, Taiwo Aina Road, Ikeja, Lagos
+                        {productDetails?.location ?? ""}
                       </p>
                       <img
                         src={mapLargeImg}
@@ -680,11 +841,12 @@ const ProductDetails = () => {
       <div className="block md:hidden font-outfit pt-4 pb-8">
         {/* Breadcrumb + actions */}
         <div className="flex items-center justify-between mb-4 px-4">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-main text-xs">Home</span>
-            <LuChevronRight className="text-icon" size={8} />
-            <span className="text-icon text-xs">Used parts</span>
-          </div>
+          <Breadcrumbs
+            items={[
+              { label: "Home", to: "/" },
+              { label: "Used parts", to: "/product-listing-grid" },
+            ]}
+          />
           <div className="flex items-center gap-4">
             <PiHeart className="text-heading text-xl" />
             <CiExport className="text-heading text-xl" />
@@ -768,13 +930,41 @@ const ProductDetails = () => {
         </div>
 
         <div className="px-4">
+          <div className="mb-4 inline-flex items-center gap-5 rounded-2xl bg-[#EDF2F4] px-4 py-2 text-heading">
+            <button
+              type="button"
+              onClick={decreaseSelectedQuantity}
+              className="cursor-pointer"
+            >
+              <PiMinusLight size={14} color="#121212" />
+            </button>
+            <span className="font-semibold text-base">{selectedQuantity}</span>
+            <button
+              type="button"
+              onClick={increaseSelectedQuantity}
+              className="cursor-pointer"
+            >
+              <PiPlusLight size={14} color="#121212" />
+            </button>
+          </div>
+
           {/* Save / Add to cart */}
           <div className="flex items-center gap-3 mb-6">
-            <button className="flex-1 rounded-2xl border border-main text-main font-medium text-sm py-3.5">
-              Save Item
+            <button
+              type="button"
+              onClick={() => handleAddToCart({ redirectToCart: true })}
+              disabled={isOutOfStock || cartLoading}
+              className="flex-1 rounded-2xl border border-main text-main font-medium text-sm py-3.5 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Buy Now
             </button>
-            <button className="flex-1 rounded-2xl bg-main text-white font-medium text-sm py-3.5">
-              Add to Cart
+            <button
+              type="button"
+              onClick={() => handleAddToCart()}
+              disabled={isAlreadyInCart || isOutOfStock || cartLoading}
+              className={`flex-1 rounded-2xl text-white font-medium text-sm py-3.5 disabled:cursor-not-allowed ${mobileAddToCartClasses}`}
+            >
+              {addToCartButtonLabel}
             </button>
           </div>
 

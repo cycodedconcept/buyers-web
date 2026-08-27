@@ -1,4 +1,4 @@
-import { contactMapImg, steeringIcon } from "../assets/Assets";
+import { contactMapImg } from "../assets/Assets";
 import BlogTitle from "../components/blog/BlogTitle";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
@@ -35,12 +35,8 @@ const ContactUs = () => {
           transition-all duration-300 z-20 pointer-events-none"
         >
           <div className="w-full h-50 flex items-center justify-center bg-[#F8FAFB] rounded-tl-2xl rounded-tr-2xl">
-            <div className="w-30 h-30">
-              <img
-                src={steeringIcon}
-                alt=""
-                className="w-full h-full object-contain"
-              />
+            <div className="flex h-30 w-30 items-center justify-center rounded-full bg-[#FF710114] text-main">
+              <PiSteeringWheelBold className="h-14 w-14" />
             </div>
           </div>
 

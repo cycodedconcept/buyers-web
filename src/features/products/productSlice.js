@@ -1,18 +1,52 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import {
+  DEFAULT_ACTIVE_FILTERS,
+  LISTING_PAGE_LIMIT,
+} from "./productConstants";
 
 const baseUrl = import.meta.env.VITE_API_URL;
+const DEFAULT_PAGINATION = {
+  page: 1,
+  limit: LISTING_PAGE_LIMIT,
+  total: 0,
+  totalPages: 1,
+};
+
+const normalizeFetchArgs = (args = {}) => {
+  if (!args || Array.isArray(args)) {
+    return { params: {}, append: false };
+  }
+
+  if ("params" in args || "append" in args) {
+    return {
+      params: args.params || {},
+      append: args.append === true,
+    };
+  }
+
+  return {
+    params: args,
+    append: false,
+  };
+};
 
 export const fetchAllProducts = createAsyncThunk(
   "product/fetchAllProducts",
-  async (params = {}, { getState, rejectWithValue }) => {
+  async (args = {}, { getState, rejectWithValue }) => {
     try {
       const { token } = getState().auth;
+      const { params, append } = normalizeFetchArgs(args);
       const response = await axios.get(`${baseUrl}/products`, {
         params,
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      return response.data;
+      return {
+        ...response.data,
+        meta: {
+          append,
+        },
+      };
     } catch (error) {
       if (error.response && error.response.data)
         return rejectWithValue(error.response.data);
@@ -27,7 +61,7 @@ export const fetchProductDetails = createAsyncThunk(
     try {
       const { token } = getState().auth;
       const response = await axios.get(`${baseUrl}/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       return response.data;
     } catch (error) {
@@ -44,17 +78,10 @@ const productSlice = createSlice({
     products: [],
     productDetails: null,
     availableFilters: {},
-    activeFilters: {
-      partName: "",
-      vehicleMake: "",
-      vehicleModel: "",
-      vehicleYear: "",
-      category: "",
-      minPriceKobo: "",
-      maxPriceKobo: "",
-      condition: "",
-    },
+    activeFilters: DEFAULT_ACTIVE_FILTERS,
+    pagination: DEFAULT_PAGINATION,
     productsLoading: false,
+    productsLoadingMore: false,
     productDetailsLoading: false,
     productsError: null,
     productDetailsError: null,
@@ -69,17 +96,31 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchAllProducts.pending, (state) => {
-        state.productsLoading = true;
+      .addCase(fetchAllProducts.pending, (state, action) => {
+        const { append } = normalizeFetchArgs(action.meta.arg);
+        state.productsLoading = !append;
+        state.productsLoadingMore = append;
         state.productsError = null;
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
+        const incomingProducts = action.payload?.data?.products || [];
+        const shouldAppend = action.payload?.meta?.append === true;
+        const responsePagination = action.payload?.data?.pagination;
+
         state.productsLoading = false;
+        state.productsLoadingMore = false;
         state.productsError = null;
-        state.products = action.payload.data.products;
+        state.products = shouldAppend
+          ? [...state.products, ...incomingProducts]
+          : incomingProducts;
+        state.pagination = responsePagination || {
+          ...DEFAULT_PAGINATION,
+          total: state.products.length,
+        };
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.productsLoading = false;
+        state.productsLoadingMore = false;
         const payload = action.payload;
         const errorMsg =
           typeof payload === "string"
@@ -113,4 +154,5 @@ const productSlice = createSlice({
 });
 
 export const { setActiveFilter } = productSlice.actions;
+export { DEFAULT_ACTIVE_FILTERS, DEFAULT_PAGINATION };
 export default productSlice.reducer;

@@ -114,7 +114,7 @@ export const getCurrentUser = createAsyncThunk(
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
-      const response = await axios.get(`${baseUrl}/auth/me`, {
+      const response = await axios.get(`${baseUrl}/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Token: token,
@@ -169,8 +169,10 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.data.user;
+        state.error = null;
+        state.user = action.payload.data.user || action.payload.data;
         state.isAuthenticated = true;
+        localStorage.setItem("user", JSON.stringify(state.user));
       })
       .addMatcher(
         (action) =>
@@ -178,7 +180,7 @@ const authSlice = createSlice({
         (state) => {
           state.isLoading = true;
           state.error = null;
-          state.isAuthenticated = false
+          state.isAuthenticated = !!state.token
         },
       )
       .addMatcher(
@@ -195,7 +197,7 @@ const authSlice = createSlice({
 
           // console.log("REJECTED PAYLOAD:", payload);
           state.isLoading = false;
-          state.isAuthenticated = false;
+          state.isAuthenticated = !!state.token;
           state.error = errorMessage;
         },
       )

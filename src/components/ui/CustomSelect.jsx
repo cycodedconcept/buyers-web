@@ -6,8 +6,11 @@ const CustomSelect = ({
   onChange,
   open,
   setOpen,
-  filterName
+  filterName,
+  selectedValue = "",
 }) => {
+  const activeOption = filterOptions.find((option) => option.value === selectedValue);
+
   return (
     <>
       <div className="relative shrink-0">
@@ -18,7 +21,7 @@ const CustomSelect = ({
           }}
           className="w-full flex items-center justify-between px-4 py-2 border border-line rounded-2xl font-outfit text-base text-heading bg-white"
         >
-          <span>{label}</span>
+          <span>{activeOption?.label || label}</span>
           <LuChevronDown size={20} className="pointer-events-none" />
         </button>
         {open && (

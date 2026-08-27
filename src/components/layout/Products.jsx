@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   fetchAllProducts,
   setActiveFilter,
+  DEFAULT_ACTIVE_FILTERS,
 } from "../../features/products/productSlice";
 import Button from "../ui/Button";
 import ProductCard from "../ui/ProductCard";
@@ -12,15 +13,8 @@ import ProductEmptyState from "../ui/ProductEmptyState";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { LuChevronDown } from "react-icons/lu";
 import { ImEqualizer2 } from "react-icons/im";
-import Pagination from "../ui/Pagination";
 import { cleanParams } from "../../utils/utilityFunc";
-
-const CONDITIONOPTIONS = [
-  { label: "All", value: "" },
-  { label: "New", value: "new" },
-  { label: "Used", value: "used" },
-  { label: "OEM", value: "OEM"},
-];
+import { PRODUCT_CONDITION_OPTIONS } from "../../features/products/productConstants";
 
 const Products = ({
   limit = 8,
@@ -29,6 +23,8 @@ const Products = ({
   slider = false,
   bgMobile = "#F9FAFB",
   isListingGrid = false,
+  sectionClassName = "",
+  autoFetch = true,
 }) => {
   const [visibleCount, setVisibleCount] = useState(() => {
     if (typeof window === "undefined") return limit;
@@ -42,10 +38,17 @@ const Products = ({
   );
 
   const handleConditionClick = (value) => {
-    const updatedFilters = { ...activeFilters, condition: value };
+    if (value === "") {
+      dispatch(setActiveFilter(DEFAULT_ACTIVE_FILTERS));
+      return;
+    }
 
-    dispatch(setActiveFilter({ condition: value }));
-    dispatch(fetchAllProducts(cleanParams(updatedFilters)));
+    dispatch(
+      setActiveFilter({
+        ...DEFAULT_ACTIVE_FILTERS,
+        condition: value,
+      }),
+    );
   };
 
   useEffect(() => {
@@ -66,8 +69,18 @@ const Products = ({
   }, [limit]);
 
   useEffect(() => {
-    dispatch(fetchAllProducts());
-  }, [dispatch]);
+    if (!autoFetch) {
+      return undefined;
+    }
+
+    dispatch(
+      fetchAllProducts({
+        params: cleanParams(activeFilters),
+      }),
+    );
+
+    return undefined;
+  }, [activeFilters, autoFetch, dispatch]);
 
   const productsArr = products.slice(0, visibleCount);
   return (
@@ -75,7 +88,7 @@ const Products = ({
       {isListingGrid ? (
         <>
           <div
-            className={`container px-4 py-8 lg:py-15 ${bgMobile} lg:bg-transparent overflow-hidden`}
+            className={`container px-4 py-8 lg:py-15 ${bgMobile} lg:bg-transparent overflow-hidden ${sectionClassName}`}
           >
             <h2 className="font-outfit font-medium text-[30px] text-heading">
               Listing Grid
@@ -211,17 +224,16 @@ const Products = ({
               </div>
             </div>
             <div className="grid auto-rows-fr grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 relative w-full">
-              {products.slice(0, 12).map((product, index) => (
-                <ProductCard key={index} product={product} />
+              {products.slice(0, 12).map((product) => (
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
-            <Pagination />
           </div>
         </>
       ) : (
         <>
           <div
-            className={`container px-3 lg:px-0 py-12 lg:py-20 ${bgMobile} lg:bg-transparent`}
+            className={`container px-3 py-12 lg:px-0 lg:py-20 ${bgMobile} lg:bg-transparent ${sectionClassName}`}
           >
             <div className="flex items-center justify-between mb-7">
               <h2 className="font-outfit lg:font-fraunces text-heading text-[20px] lg:text-[30px]">
@@ -238,7 +250,7 @@ const Products = ({
             </div>
             {!fourGridDisplay && (
               <div className="flex gap-4 text-black font-outfit text-base mb-3 lg:mb-5">
-                {CONDITIONOPTIONS.map((option) => (
+                {PRODUCT_CONDITION_OPTIONS.map((option) => (
                   <button
                     key={option.label}
                     onClick={() => handleConditionClick(option.value)}
@@ -255,7 +267,11 @@ const Products = ({
               <ProductErrorState
                 message={productsError}
                 onRetry={() =>
-                  dispatch(fetchAllProducts(cleanParams(activeFilters)))
+                  dispatch(
+                    fetchAllProducts({
+                      params: cleanParams(activeFilters),
+                    }),
+                  )
                 }
               />
             ) : products.length === 0 ? (
@@ -264,8 +280,7 @@ const Products = ({
                 message="Please try a different search or clear filters to discover available parts."
                 actionLabel="Clear filters"
                 onAction={() => {
-                  dispatch(setActiveFilter({ condition: "" }));
-                  dispatch(fetchAllProducts());
+                  dispatch(setActiveFilter(DEFAULT_ACTIVE_FILTERS));
                 }}
               />
             ) : (

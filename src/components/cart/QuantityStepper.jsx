@@ -1,6 +1,14 @@
 import { PiMinusLight, PiPlusLight } from "react-icons/pi";
 
-const QuantityStepper = ({ quantity, onIncrease, onDecrease, size = "md" }) => {
+const QuantityStepper = ({
+  quantity,
+  onIncrease,
+  onDecrease,
+  size = "md",
+  disabled = false,
+  disableIncrease = false,
+  disableDecrease = false,
+}) => {
   const isSm = size === "sm";
 
   return (
@@ -15,7 +23,8 @@ const QuantityStepper = ({ quantity, onIncrease, onDecrease, size = "md" }) => {
         type="button"
         onClick={onDecrease}
         aria-label="Decrease quantity"
-        className="text-heading flex items-center justify-center"
+        disabled={disabled || disableDecrease}
+        className="text-heading flex items-center justify-center disabled:opacity-40"
       >
         <PiMinusLight size={16} />
       </button>
@@ -24,7 +33,8 @@ const QuantityStepper = ({ quantity, onIncrease, onDecrease, size = "md" }) => {
         type="button"
         onClick={onIncrease}
         aria-label="Increase quantity"
-        className="text-heading flex items-center justify-center"
+        disabled={disabled || disableIncrease}
+        className="text-heading flex items-center justify-center disabled:opacity-40"
       >
         <PiPlusLight size={16} />
       </button>

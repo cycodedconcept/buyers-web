@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from "react-redux";
 import { fetchAllProducts } from "../features/products/productSlice";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
+import Breadcrumbs from "../components/ui/Breadcrumbs";
 import {
-  LuChevronRight,
   LuChevronDown,
   LuChevronLeft,
   LuCheck,
@@ -44,11 +44,13 @@ const ListingGrid2 = () => {
         <Navbar isListingPage isHomepage={false}/>
       <div className="container px-3 md:py-14">
         <div className="hidden md:block">
-          <div className="flex items-center gap-2 mb-6">
-            <span className="font-semibold text-main text-xs">Home</span>
-            <LuChevronRight className="text-icon" size={8} />
-            <span className="text-icon text-xs">Used parts for sale</span>
-          </div>
+          <Breadcrumbs
+            className="mb-6"
+            items={[
+              { label: "Home", to: "/" },
+              { label: "Used parts for sale" },
+            ]}
+          />
 
           <div>
             <h2 className="font-outfit font-medium text-[30px] text-heading mb-4">

@@ -46,7 +46,10 @@ const Homepage = () => {
 		<>
 			<Header />
 			<CategoryBrowse />
-			<Products fourGridDisplay={false} />
+			<Products
+				fourGridDisplay={false}
+				sectionClassName="my-12 px-4 lg:my-16 lg:px-6"
+			/>
 			<Benefits />
 			<Cta />
 			<div className="lg:hidden">
@@ -88,6 +91,8 @@ const Homepage = () => {
 					limit={4}
 					headingText="More Parts You May Need"
 					slider={true}
+					sectionClassName="my-12 px-4 lg:my-16 lg:px-6"
+					autoFetch={false}
 				/>
 				<Testimony />
 				<Cta ctaType="single" />

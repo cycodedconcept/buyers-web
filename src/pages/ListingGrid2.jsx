@@ -7,6 +7,7 @@ import Breadcrumbs from "../components/ui/Breadcrumbs";
 import {
   LuChevronDown,
   LuChevronLeft,
+  LuChevronRight,
   LuCheck,
 } from "react-icons/lu";
 import { CgMenuGridO } from "react-icons/cg";

@@ -1,8 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { logout } from "../auth/authSlice";
-
-const baseUrl = import.meta.env.VITE_API_URL;
+import baseUrl from "../../config/baseUrl";
 
 const DEFAULT_CART_SUMMARY = {
   itemCount: 0,

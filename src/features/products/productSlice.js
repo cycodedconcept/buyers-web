@@ -1,11 +1,10 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import baseUrl from "../../config/baseUrl";
 import {
   DEFAULT_ACTIVE_FILTERS,
   LISTING_PAGE_LIMIT,
 } from "./productConstants";
-
-const baseUrl = import.meta.env.VITE_API_URL;
 const DEFAULT_PAGINATION = {
   page: 1,
   limit: LISTING_PAGE_LIMIT,

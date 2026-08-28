@@ -1,8 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { logout } from "../auth/authSlice";
-
-const baseUrl = import.meta.env.VITE_API_URL;
+import baseUrl from "../../config/baseUrl";
 const CHECKOUT_STORAGE_KEY = "autoparts_checkout_session";
 
 const DEFAULT_ORDER_SUMMARY = {

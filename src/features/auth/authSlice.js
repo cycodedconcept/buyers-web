@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
-const baseUrl = import.meta.env.VITE_API_URL;
+import baseUrl from "../../config/baseUrl";
 
 const storedToken = localStorage.getItem("token");
 const storedUser = localStorage.getItem("user")

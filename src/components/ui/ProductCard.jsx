@@ -12,6 +12,7 @@ import {
   selectCartItems,
   selectCartLoading,
 } from "../../features/cart/cartSlice";
+import baseUrl from "../../config/baseUrl";
 
 const getErrorMessage = (error) =>
   typeof error === "string"
@@ -29,7 +30,7 @@ const ProductCard = ({
   const cartLoading = useSelector(selectCartLoading);
   const imageUrl = product.primaryImageUrl?.startsWith("http")
     ? product.primaryImageUrl
-    : `${import.meta.env.VITE_API_URL}/${product.primaryImageUrl}`;
+    : `${baseUrl}/${product.primaryImageUrl}`;
   const isOutOfStock = Number(product.stockQty) === 0;
   const isAlreadyInCart = cartItems.some(
     (item) => String(item.product?.id) === String(product.id),

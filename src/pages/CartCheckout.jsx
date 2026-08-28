@@ -9,6 +9,7 @@ import ShoppingCartStep from "../components/cart/ShoppingCartStep";
 import CheckoutDetailsStep from "../components/cart/CheckoutDetailsStep";
 import OrderCompleteStep from "../components/cart/OrderCompleteStep";
 import Footer from "../components/layout/Footer";
+import baseUrl from "../config/baseUrl";
 import {
   fetchCart,
   selectCartError,
@@ -38,7 +39,7 @@ const getCartItemImageUrl = (primaryImageUrl) => {
 
   return primaryImageUrl.startsWith("http")
     ? primaryImageUrl
-    : `${import.meta.env.VITE_API_URL}/${primaryImageUrl}`;
+    : `${baseUrl}/${primaryImageUrl}`;
 };
 
 const normalizeCartItem = (item) => ({

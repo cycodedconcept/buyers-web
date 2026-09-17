@@ -152,6 +152,11 @@ const UserAccountMenu = ({ user, isLoading, onLogout }) => {
                 </div>
               </div>
 
+              <div className="mb-4 grid grid-cols-2 gap-3">
+                <Link to="/orders" onClick={() => setIsOpen(false)} className="rounded-xl border border-line px-3 py-2 text-center font-outfit text-sm font-semibold text-heading hover:border-main hover:text-main">My Orders</Link>
+                <Link to="/disputes" onClick={() => setIsOpen(false)} className="rounded-xl border border-line px-3 py-2 text-center font-outfit text-sm font-semibold text-heading hover:border-main hover:text-main">My Disputes</Link>
+              </div>
+
               <button
                 type="button"
                 onClick={handleLogout}
@@ -166,6 +171,10 @@ const UserAccountMenu = ({ user, isLoading, onLogout }) => {
               <p className="font-outfit text-heading text-base font-semibold">
                 We couldn&apos;t load your account details right now.
               </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Link to="/orders" onClick={() => setIsOpen(false)} className="rounded-xl border border-line px-3 py-2 text-center font-outfit text-sm font-semibold text-heading">My Orders</Link>
+                <Link to="/disputes" onClick={() => setIsOpen(false)} className="rounded-xl border border-line px-3 py-2 text-center font-outfit text-sm font-semibold text-heading">My Disputes</Link>
+              </div>
               <button
                 type="button"
                 onClick={handleLogout}
@@ -184,6 +193,7 @@ const UserAccountMenu = ({ user, isLoading, onLogout }) => {
 
 const Navbar = ({ isHomepage = true, isListingPage = false }) => {
   const dispatch = useDispatch();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { token, user, isLoading } = useSelector((state) => state.auth);
   const cartItemCount = useSelector(selectCartItemCount);
   const badgeCount = cartItemCount > 99 ? "99+" : cartItemCount;
@@ -211,7 +221,7 @@ const Navbar = ({ isHomepage = true, isListingPage = false }) => {
         >
           {isHomepage ? (
             <div className="flex items-center justify-between">
-              <LuMenu size={24} className="block lg:hidden" />
+              <button type="button" aria-label="Open menu" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)}><LuMenu size={24} className="block lg:hidden" /></button>
               <div className="flex items-center gap-2">
                 <Link to="/cart" className={`${cartLinkClasses} px-3 py-2`}>
                   <span className="relative inline-flex">
@@ -253,17 +263,30 @@ const Navbar = ({ isHomepage = true, isListingPage = false }) => {
               ) : (
                 <Button>Register</Button>
               )}
-              <button className="flex items-center justify-center w-12 h-12 rounded-lg border border-line">
+              <button type="button" aria-label="Open menu" aria-expanded={mobileMenuOpen} onClick={() => setMobileMenuOpen((open) => !open)} className="flex items-center justify-center w-12 h-12 rounded-lg border border-line">
                 <LuMenu size={28} className="inline lg:hidden rounded-sm" />
               </button>
             </div>
+          )}
+          {mobileMenuOpen && (
+            <nav aria-label="Mobile navigation" className="mt-4 grid gap-1 rounded-2xl border border-line bg-white p-3 font-outfit shadow-md">
+              {[
+                ["Home", "/"],
+                ["Browse Parts", "/product-listing"],
+                ["Orders", "/orders"],
+                ["Disputes", "/disputes"],
+                ["Blog", "/blog"],
+                ["Contact", "/contact-us"],
+                ...(!isLoggedIn ? [["Login", "/login"]] : []),
+              ].map(([label, path]) => <Link key={path} to={path} onClick={() => setMobileMenuOpen(false)} className="rounded-xl px-4 py-2 text-heading hover:bg-[#F3F5F7] hover:text-main">{label}</Link>)}
+            </nav>
           )}
         </div>
         <div className="hidden lg:flex items-center justify-between">
           <div>
             <img src={logoImg} alt="brand logo" />
           </div>
-          <nav className="flex items-center space-x-8 font-outfit">
+          <nav className="flex items-center gap-3 whitespace-nowrap font-outfit text-sm xl:gap-6 xl:text-base">
             <NavLink
               to="/"
               className={({ isActive }) =>
@@ -281,20 +304,20 @@ const Navbar = ({ isHomepage = true, isListingPage = false }) => {
               Browse Parts
             </NavLink>
             <NavLink
-              to="/vehicle"
+              to="/orders"
               className={({ isActive }) =>
                 `hover:text-main transition-colors ${isActive ? "text-main" : ""}`
               }
             >
-              By vehicle
+              Orders
             </NavLink>
             <NavLink
-              to="/sellers"
+              to="/disputes"
               className={({ isActive }) =>
                 `hover:text-main transition-colors ${isActive ? "text-main" : ""}`
               }
             >
-              Sellers
+              Disputes
             </NavLink>
             <NavLink
               to="/blog"

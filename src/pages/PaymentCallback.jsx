@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
@@ -14,6 +14,7 @@ import {
   selectCurrentPayment,
   selectPaymentError,
   selectPaymentInitializing,
+  selectPaymentReference,
   selectPaymentStatus,
   selectPaymentVerified,
   selectPaymentVerifying,
@@ -28,12 +29,8 @@ const redirectToAuthorizationUrl = (authorizationUrl) => {
   window.location.assign(authorizationUrl);
 };
 
-const getReferenceFromSearch = (search) =>
-  new URLSearchParams(search).get("reference");
-
 const PaymentCallback = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   const navigate = useNavigate();
   const verificationRequestedRef = useRef(null);
   const [localMessage, setLocalMessage] = useState(null);
@@ -43,11 +40,10 @@ const PaymentCallback = () => {
   const currentPayment = useSelector(selectCurrentPayment);
   const paymentError = useSelector(selectPaymentError);
   const paymentInitializing = useSelector(selectPaymentInitializing);
+  const paymentReference = useSelector(selectPaymentReference);
   const paymentVerifying = useSelector(selectPaymentVerifying);
   const paymentStatus = useSelector(selectPaymentStatus);
   const paymentVerified = useSelector(selectPaymentVerified);
-  const callbackReference = getReferenceFromSearch(location.search);
-
   const isPaymentComplete =
     paymentVerified &&
     paymentStatus === "paid" &&
@@ -56,33 +52,34 @@ const PaymentCallback = () => {
   useEffect(() => {
     if (
       !token ||
-      !callbackReference ||
-      verificationRequestedRef.current === callbackReference
+      !paymentReference ||
+      verificationRequestedRef.current === paymentReference
     ) {
       return;
     }
 
-    verificationRequestedRef.current = callbackReference;
+    verificationRequestedRef.current = paymentReference;
     setLocalMessage(null);
 
     dispatch(
       verifyPayment({
-        reference: callbackReference,
+        reference: paymentReference,
       }),
     )
       .unwrap()
       .then((response) => {
         if (
           response?.data?.verified === true &&
-          response?.data?.payment?.status === "paid"
+          response?.data?.payment?.status === "paid" &&
+          response?.data?.order?.status === "confirmed"
         ) {
           dispatch(fetchCart());
         }
-
-        navigate("/product-listing", { replace: true });
       })
-      .catch(() => {});
-  }, [callbackReference, dispatch, navigate, token]);
+      .catch(() => {
+        // The rejected thunk stores the backend error for the failure state.
+      });
+  }, [dispatch, paymentReference, token]);
 
   const handleRetryPayment = async () => {
     if (!currentOrderId) {
@@ -123,8 +120,8 @@ const PaymentCallback = () => {
   };
 
   const missingReferenceMessage = currentOrderId
-    ? "We couldn't find a Paystack reference in the callback URL. You can restart payment for this saved order."
-    : "No Paystack reference was found in the callback URL. Please return to your cart and create the order again.";
+    ? "We couldn't find the saved Paystack reference for this order. You can restart payment for this saved order."
+    : "No saved Paystack reference was found. Please return to your cart and create the order again.";
   const fallbackOrder =
     currentOrder || (currentOrderId ? { id: currentOrderId } : null);
 
@@ -165,7 +162,7 @@ const PaymentCallback = () => {
               </button>
             </div>
           </div>
-        ) : !callbackReference ? (
+        ) : !paymentReference ? (
           currentOrderId ? (
             <OrderCompleteStep
               order={fallbackOrder}
@@ -204,9 +201,8 @@ const PaymentCallback = () => {
               We&apos;re confirming your Paystack payment
             </h2>
             <p className="mx-auto max-w-3xl font-outfit text-base text-text">
-              Please wait while we verify the Paystack reference from the
-              callback URL with the backend. You&apos;ll be sent back to the
-              product page as soon as this request succeeds.
+              Please wait while we verify your saved Paystack payment reference.
+              Your order status will appear here when verification finishes.
             </p>
           </div>
         ) : isPaymentComplete ? (
@@ -215,7 +211,9 @@ const PaymentCallback = () => {
             payment={currentPayment}
             mode="success"
             primaryActionLabel="Continue Shopping"
+            secondaryActionLabel="View Order"
             onPrimaryAction={handleContinueShopping}
+            onSecondaryAction={() => navigate(`/orders/${currentOrderId}`)}
           />
         ) : (
           <OrderCompleteStep

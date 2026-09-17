@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import {useDispatch, useSelector} from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { fetchAllProducts } from "../features/products/productSlice";
+import { LISTING_PAGE_LIMIT } from "../features/products/productConstants";
 import Navbar from "../components/layout/Navbar";
 import TopInfo from "../components/layout/TopInfo";
 import Breadcrumbs from "../components/ui/Breadcrumbs";
-import {
-  LuChevronDown,
-  LuChevronLeft,
-  LuChevronRight,
-  LuCheck,
-} from "react-icons/lu";
+import { LuChevronDown, LuCheck } from "react-icons/lu";
 import { CgMenuGridO } from "react-icons/cg";
 import { FaListUl, FaTimes } from "react-icons/fa";
 import ProductCard from "../components/ui/ProductCard";
+import PageControls from "../components/ui/PageControls";
 import Footer from "../components/layout/Footer";
+
+const PAGE_SIZE_OPTIONS = [LISTING_PAGE_LIMIT, 24, 50];
 
 const ListingGrid2 = () => {
   const minLimit = 2000;
@@ -30,12 +30,39 @@ const ListingGrid2 = () => {
   const widthPercent =
     ((currentMax - minLimit) / totalRange) * 100 - leftPercent;
 
-    const {products} = useSelector(state => state.products);
-    const dispatch = useDispatch();
+  const { products, pagination, productsLoading, productsError } = useSelector(
+    (state) => state.products,
+  );
+  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedPage = Number(searchParams.get("page"));
+  const page = Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const requestedLimit = Number(searchParams.get("limit"));
+  const limit = PAGE_SIZE_OPTIONS.includes(requestedLimit)
+    ? requestedLimit
+    : LISTING_PAGE_LIMIT;
 
-    useEffect(() => {
-      dispatch(fetchAllProducts())
-    }, [dispatch])
+  useEffect(() => {
+    dispatch(fetchAllProducts({ params: { page, limit } }));
+  }, [dispatch, page, limit]);
+
+  const handlePageChange = (nextPage) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set("page", String(nextPage));
+      next.set("limit", String(limit));
+      return next;
+    });
+  };
+
+  const handlePageSizeChange = (event) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set("page", "1");
+      next.set("limit", event.target.value);
+      return next;
+    });
+  };
 
   return (
     <>
@@ -58,7 +85,7 @@ const ListingGrid2 = () => {
               Listing Grid
             </h2>
             <p className="text-text text-sm font-outfit mb-6">
-              There Are Currently {products.length} Results
+              There Are Currently {pagination?.total ?? 0} Results
             </p>
 
             <div className="mb-7 w-full">
@@ -440,11 +467,14 @@ const ListingGrid2 = () => {
                 </button>
                 <div className="relative shrink-0">
                   <select
-                    name=""
-                    id=""
+                    aria-label="Products per page"
+                    value={limit}
+                    onChange={handlePageSizeChange}
                     className="py-1 px-4 border border-line rounded-lg font-outfit text-base text-heading appearance-none pr-15 active:outline-none focus:outline-none caret-[#4D4DE5]"
                   >
-                    <option value="">Show: 50</option>
+                    {PAGE_SIZE_OPTIONS.map((size) => (
+                      <option key={size} value={size}>Show: {size}</option>
+                    ))}
                   </select>
                   <LuChevronDown
                     className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-heading"
@@ -470,40 +500,33 @@ const ListingGrid2 = () => {
 
             <div className="flex md:hidden my-6 items-center justify-between">
               <p className="text-xs text-black font-inter font-semibold">
-                17 Results
+                {pagination?.total ?? 0} Results
               </p>
               <p className="text-xs font-inter text-black font-semibold">
                 <span className="text-text font-normal">Sort by:</span> Recent
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {products.map((product, idx) => (
-                <ProductCard key={idx} product={product} />
-              ))}
-            </div>
-            <div className="mt-8 hidden md:flex items-center justify-center gap-3">
-              <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                <LuChevronLeft size={20} />
-              </button>
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                1
-              </button>
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                2
-              </button>
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-main bg-main text-white">
-                3
-              </button>
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                4
-              </button>
-              <button className="flex h-12 min-w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                ...
-              </button>
-              <button className="flex h-12 w-12 items-center justify-center rounded-xl font-outfit border border-line bg-white text-heading">
-                <LuChevronRight size={20} />
-              </button>
-            </div>
+            {productsLoading ? (
+              <p role="status" className="py-8 text-center text-text">Loading products...</p>
+            ) : productsError ? (
+              <div className="py-8 text-center text-text">
+                <p>{productsError}</p>
+                <button type="button" className="mt-3 text-main" onClick={() => dispatch(fetchAllProducts({ params: { page, limit } }))}>
+                  Try again
+                </button>
+              </div>
+            ) : products.length === 0 ? (
+              <p className="py-8 text-center text-text">No products found.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+            {!productsLoading && !productsError && (
+              <PageControls pagination={pagination} onPageChange={handlePageChange} />
+            )}
           </div>
         </div>
       </div>

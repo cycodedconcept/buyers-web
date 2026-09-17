@@ -6,6 +6,7 @@ import {
 	logoWhiteImg,
 } from "../../assets/Assets";
 import Button from "../ui/Button";
+import { Link } from "react-router-dom";
 import {
 	FaFacebookF,
 	FaInstagram,
@@ -72,8 +73,8 @@ const Footer = ({listingGridMobile, aboutFooter = false}) => {
 	if(aboutFooter) {
 		return (
       <>
-        <div className="bg-heading font-outfit">
-          <div className="container px-4 py-8">
+        <div className="bg-heading font-outfit px-5">
+		  <div className="container px-5 py-8">
             <div className="grid grid-cols-2 gap-5">
               {FOOTERARRAY[2].map((element, index) => (
                 <div key={index} className="flex items-center gap-5">
@@ -158,7 +159,7 @@ const Footer = ({listingGridMobile, aboutFooter = false}) => {
 		return (
       <>
         <div className="bg-heading text-white font-outfit">
-          <div className="container px-4 py-8">
+          <div className="container px-5 py-8">
             <div className="mb-5">
               <h4 className="text-white font-medium text-[20px] mb-7">
                 Newsletter
@@ -201,7 +202,7 @@ const Footer = ({listingGridMobile, aboutFooter = false}) => {
 	return (
 		<>
 			<div className="bg-heading text-white font-outfit lg:hidden">
-				<div className="container px-4 py-8 space-y-8">
+				<div className="container px-5 py-8 space-y-8">
 					<p className="text-sm leading-[1.6] text-text">
 						Stay on top of the latest trends and buying tips.
 					</p>
@@ -246,7 +247,7 @@ const Footer = ({listingGridMobile, aboutFooter = false}) => {
 				</div>
 			</div>
 			<div className="hidden lg:block bg-heading py-[40px] font-outfit">
-				<div className="container">
+				<div className="container px-5 lg:px-8">
 					<div className="flex items-center justify-between">
 						{FOOTERARRAY[0].map((element, index) => (
 							<div key={index} className="flex items-center gap-5">
@@ -269,7 +270,7 @@ const Footer = ({listingGridMobile, aboutFooter = false}) => {
 								</h4>
 								{element.links.map((link, index) => (
 									<ul key={index} className="">
-										<li className="text-base text-text mb-1">{link}</li>
+										<li className="text-base text-text mb-1">{link === "Track My Order" ? <Link to="/orders" className="hover:text-white">{link}</Link> : link}</li>
 									</ul>
 								))}
 							</div>

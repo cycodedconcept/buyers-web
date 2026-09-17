@@ -113,6 +113,19 @@ const getInitialState = () => {
     paymentVerifying: false,
     orderError: null,
     paymentError: null,
+    buyerOrders: [],
+    buyerOrdersPagination: { page: 1, limit: 10, total: 0, totalPages: 1 },
+    buyerOrdersLoading: false,
+    buyerOrdersError: null,
+    buyerOrderDetails: null,
+    buyerOrderDetailsLoading: false,
+    buyerOrderDetailsError: null,
+    buyerOrderStatus: null,
+    buyerOrderStatusLoading: false,
+    buyerOrderStatusError: null,
+    buyerOrderReceipt: null,
+    buyerOrderReceiptLoading: false,
+    buyerOrderReceiptError: null,
   };
 };
 
@@ -183,6 +196,89 @@ export const verifyPayment = createAsyncThunk(
     }
   },
 );
+
+export const fetchBuyerOrders = createAsyncThunk(
+  "order/fetchBuyerOrders",
+  async ({ page = 1, limit = 10 } = {}, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get(`${baseUrl}/orders`, {
+        params: { page, limit },
+        headers: getAuthHeaders(token),
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message || "Something went wrong");
+    }
+  },
+);
+
+export const fetchBuyerOrderDetails = createAsyncThunk(
+  "order/fetchBuyerOrderDetails",
+  async (orderId, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get(`${baseUrl}/orders/${orderId}`, {
+        headers: getAuthHeaders(token),
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message || "Something went wrong");
+    }
+  },
+);
+
+export const fetchBuyerOrderStatus = createAsyncThunk(
+  "order/fetchBuyerOrderStatus",
+  async (orderId, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get(`${baseUrl}/orders/${orderId}/status`, {
+        headers: getAuthHeaders(token),
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message || "Something went wrong");
+    }
+  },
+);
+
+export const fetchBuyerOrderReceipt = createAsyncThunk(
+  "order/fetchBuyerOrderReceipt",
+  async (orderId, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get(`${baseUrl}/orders/${orderId}/receipt`, {
+        headers: getAuthHeaders(token),
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message || "Something went wrong");
+    }
+  },
+);
+
+export const fetchBuyerOrderReceiptHtml = createAsyncThunk(
+  "order/fetchBuyerOrderReceiptHtml",
+  async (orderId, { getState, rejectWithValue }) => {
+    try {
+      const { token } = getState().auth;
+      const response = await axios.get(`${baseUrl}/orders/${orderId}/receipt`, {
+        params: { format: "html" },
+        headers: getAuthHeaders(token),
+        responseType: "text",
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message || "Something went wrong");
+    }
+  },
+);
+
+const getRequestError = (payload) =>
+  typeof payload === "string"
+    ? payload
+    : payload?.error?.message || payload?.message || "Something went wrong";
 
 const orderSlice = createSlice({
   name: "order",
@@ -307,6 +403,58 @@ const orderSlice = createSlice({
         state.paymentVerifying = false;
         state.paymentError = errorMsg;
       })
+      .addCase(fetchBuyerOrders.pending, (state) => {
+        state.buyerOrdersLoading = true;
+        state.buyerOrdersError = null;
+      })
+      .addCase(fetchBuyerOrders.fulfilled, (state, action) => {
+        state.buyerOrdersLoading = false;
+        state.buyerOrders = action.payload?.data?.orders || [];
+        state.buyerOrdersPagination = action.payload?.data?.pagination || state.buyerOrdersPagination;
+      })
+      .addCase(fetchBuyerOrders.rejected, (state, action) => {
+        state.buyerOrdersLoading = false;
+        state.buyerOrdersError = getRequestError(action.payload);
+      })
+      .addCase(fetchBuyerOrderDetails.pending, (state) => {
+        state.buyerOrderDetails = null;
+        state.buyerOrderDetailsLoading = true;
+        state.buyerOrderDetailsError = null;
+      })
+      .addCase(fetchBuyerOrderDetails.fulfilled, (state, action) => {
+        state.buyerOrderDetailsLoading = false;
+        state.buyerOrderDetails = action.payload?.data || null;
+      })
+      .addCase(fetchBuyerOrderDetails.rejected, (state, action) => {
+        state.buyerOrderDetailsLoading = false;
+        state.buyerOrderDetailsError = getRequestError(action.payload);
+      })
+      .addCase(fetchBuyerOrderStatus.pending, (state) => {
+        state.buyerOrderStatus = null;
+        state.buyerOrderStatusLoading = true;
+        state.buyerOrderStatusError = null;
+      })
+      .addCase(fetchBuyerOrderStatus.fulfilled, (state, action) => {
+        state.buyerOrderStatusLoading = false;
+        state.buyerOrderStatus = action.payload?.data || null;
+      })
+      .addCase(fetchBuyerOrderStatus.rejected, (state, action) => {
+        state.buyerOrderStatusLoading = false;
+        state.buyerOrderStatusError = getRequestError(action.payload);
+      })
+      .addCase(fetchBuyerOrderReceipt.pending, (state) => {
+        state.buyerOrderReceipt = null;
+        state.buyerOrderReceiptLoading = true;
+        state.buyerOrderReceiptError = null;
+      })
+      .addCase(fetchBuyerOrderReceipt.fulfilled, (state, action) => {
+        state.buyerOrderReceiptLoading = false;
+        state.buyerOrderReceipt = action.payload?.data || null;
+      })
+      .addCase(fetchBuyerOrderReceipt.rejected, (state, action) => {
+        state.buyerOrderReceiptLoading = false;
+        state.buyerOrderReceiptError = getRequestError(action.payload);
+      })
       .addCase(logout, (state) => {
         state.orderId = null;
         state.currentOrder = null;
@@ -318,6 +466,19 @@ const orderSlice = createSlice({
         state.paymentVerifying = false;
         state.orderError = null;
         state.paymentError = null;
+        state.buyerOrders = [];
+        state.buyerOrdersPagination = { page: 1, limit: 10, total: 0, totalPages: 1 };
+        state.buyerOrdersLoading = false;
+        state.buyerOrdersError = null;
+        state.buyerOrderDetails = null;
+        state.buyerOrderDetailsLoading = false;
+        state.buyerOrderDetailsError = null;
+        state.buyerOrderStatus = null;
+        state.buyerOrderStatusLoading = false;
+        state.buyerOrderStatusError = null;
+        state.buyerOrderReceipt = null;
+        state.buyerOrderReceiptLoading = false;
+        state.buyerOrderReceiptError = null;
         clearCheckoutSession();
       });
   },
@@ -346,5 +507,18 @@ export const selectOrderError = (state) => state.order.orderError;
 export const selectPaymentError = (state) => state.order.paymentError;
 export const selectPaymentLoading = (state) =>
   state.order.paymentInitializing || state.order.paymentVerifying;
+export const selectBuyerOrders = (state) => state.order.buyerOrders;
+export const selectBuyerOrdersPagination = (state) => state.order.buyerOrdersPagination;
+export const selectBuyerOrdersLoading = (state) => state.order.buyerOrdersLoading;
+export const selectBuyerOrdersError = (state) => state.order.buyerOrdersError;
+export const selectBuyerOrderDetails = (state) => state.order.buyerOrderDetails;
+export const selectBuyerOrderDetailsLoading = (state) => state.order.buyerOrderDetailsLoading;
+export const selectBuyerOrderDetailsError = (state) => state.order.buyerOrderDetailsError;
+export const selectBuyerOrderStatus = (state) => state.order.buyerOrderStatus;
+export const selectBuyerOrderStatusLoading = (state) => state.order.buyerOrderStatusLoading;
+export const selectBuyerOrderStatusError = (state) => state.order.buyerOrderStatusError;
+export const selectBuyerOrderReceipt = (state) => state.order.buyerOrderReceipt;
+export const selectBuyerOrderReceiptLoading = (state) => state.order.buyerOrderReceiptLoading;
+export const selectBuyerOrderReceiptError = (state) => state.order.buyerOrderReceiptError;
 export { CHECKOUT_STORAGE_KEY, DEFAULT_ORDER_SUMMARY };
 export default orderSlice.reducer;
